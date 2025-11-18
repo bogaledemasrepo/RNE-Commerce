@@ -1,3 +1,4 @@
+import Button from "@/components/button";
 import { Link } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -17,11 +18,7 @@ export default function Index() {
       </View>
       <View style={styles.action}>
           <Link href={"/home/page"} asChild>
-          <Pressable
-            style={styles.button}
-            onPress={() => console.log('pressed')}>
-            <Text style={(styles.text, styles.buttonText)}>Home</Text>
-          </Pressable>
+          <Button bg="" onPress={()=>{}} title={"Home"} />
           </Link>
           <Pressable
             style={styles.button}
