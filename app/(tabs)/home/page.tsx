@@ -1,8 +1,10 @@
-import Carosel from '@/components/carosel'
-import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
-import React from 'react'
-import { ScrollView, Text, TextInput, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import Carosel from '@/components/carosel';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React from 'react';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const Home = () => {
   return (<SafeAreaView style={{flex:1}}>
       <ScrollView>
@@ -24,7 +26,6 @@ const Home = () => {
             <View><Text style={{fontSize:10,fontWeight:"bold",textAlign:"center"}}>Something</Text></View>
           </View>
           ))}
-
         </ScrollView>
         <View style={{padding:8}}>
           <Carosel />
@@ -40,10 +41,42 @@ const Home = () => {
             </View>
           </View>
           <View style={{display:"flex",flexDirection:"row",gap:4}}>
-            <Text>See all</Text>
+            <Text>View all</Text>
             <FontAwesome name="angle-right" size={20} color="#858585ff" />
           </View>
         </View>
+        <View style={{padding:8,display:"flex",gap:8,flexWrap:"wrap",flexDirection:"row"}} >
+          {[1,2,3,4,5].map(Item=>(<Pressable key={Item} onPress={()=>router.navigate("/(tabs)/home/detail")} style={{
+              height:180,
+              width:"48%",
+              borderRadius:8,
+              borderWidth:1,
+              borderColor:"#ccccccff",
+              position:"relative"
+            }}>
+              <LinearGradient
+                  colors={['transparent','transparent','rgba(0,0,0,0.3)']}
+                  style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      height: "100%",
+                      borderRadius:8
+                    }}
+                />
+              <View style={{position:"absolute",bottom:4,width:"100%",paddingHorizontal:4,flexDirection:"row",justifyContent:"space-between"}}>
+                <Text style={{fontWeight:"semibold"}}>Some Thing</Text>
+                <Text style={{fontWeight:"bold"}}>$180.0</Text>
+              </View>
+              <Pressable onPress={()=>{}}>
+                  <Ionicons style={{position:"absolute",right:4,top:4}} name="heart-outline" size={24} color="#858585ff" />
+              </Pressable>
+            </Pressable>
+          ))}
+          </View>
+
+<View style={{height:40,width:"50%",backgroundColor:"#eee"}}></View>
       </ScrollView>
     </SafeAreaView>
   )
