@@ -1,5 +1,6 @@
+
 import Button from "@/components/button";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
@@ -22,7 +23,7 @@ export default function Index() {
           </Link>
           <Pressable
             style={styles.button}
-            onPress={() => console.log('pressed')}>
+            onPress={() => router.navigate("/(auth)/sign-in/page")}>
             <Text style={(styles.text, styles.buttonText)}>Login</Text>
           </Pressable>
         </View>
@@ -30,7 +31,7 @@ export default function Index() {
   );
 }
 
-// remember to import StyleSheet from react-native
+
 const styles = StyleSheet.create({
   container:{
         flex: 1,
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding:16
       },
+      
   heading: {
     fontSize: 18,
     fontWeight: '600',
