@@ -14,19 +14,46 @@ import {
 } from "react-native";
 
 import COLORS from "@/constants/color";
+import { useAuth } from "@/context/use-auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Toast } from "toastify-react-native";
 
 export default function Login() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsloading] = useState(false);
+  const {setUser} = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    //const result = await login(email, password);
-
-   // if (!result.success) Alert.alert("Error", result.error);
+  const handleSubmit =async () => {
+    setIsloading(true);
+    try {
+      const tokenPromise = await fetch('https://exp-server-collection.onrender.com/shoeshop/auth/register',{
+       method:"POST",headers:{
+        'accept': '*/*',
+        "Content-Type":"application/json"
+       }
+       ,body:`{"name":"${name}","email":"${email}","password":"${password}"}`
+      })
+      console.log(tokenPromise);
+      if(!tokenPromise.ok){  
+          Toast.error('Error message!')
+          return; 
+        }
+      Toast.success('Registration successful!')
+      const {token,user} = await tokenPromise.json();
+      AsyncStorage.setItem('token',token);
+      setUser(user)
+    } catch (error) {
+      Toast.error('Registration failed. Please try again.');
+      console.log("Registration error:",error);
+      
+    }finally{
+      setIsloading(false);
+    }
+    
   };
-
-  //if (isCheckingAuth) return null;
 
   return (
     <KeyboardAvoidingView
@@ -39,7 +66,7 @@ export default function Login() {
           <View style={styles.formContainer}>
             {/* USERNAME */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>User name</Text>
               <View style={styles.inputContainer}>
                 <Ionicons
                   name="person-outline"
@@ -51,9 +78,9 @@ export default function Login() {
                   style={styles.input}
                   placeholder="Enter user name"
                   placeholderTextColor={COLORS.placeholderText}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
+                  value={name}
+                  onChangeText={setName}
+                  keyboardType="default"
                   autoCapitalize="none"
                 />
               </View>
@@ -115,11 +142,11 @@ export default function Login() {
             </View>
 
             
-            <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={false}>
-              {false ? (
+            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={isLoading}>
+              {isLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={styles.buttonText}>Register</Text>
               )}
             </TouchableOpacity>
 

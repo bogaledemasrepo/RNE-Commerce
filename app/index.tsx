@@ -1,9 +1,10 @@
 
-import Button from "@/components/button";
-import { Link, router } from "expo-router";
+import COLORS from "@/constants/color";
+import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
+
   return ( <View
       style={styles.container}
     >
@@ -18,27 +19,26 @@ export default function Index() {
         </Text>
       </View>
       <View style={styles.action}>
-          <Link href={"/home/page"} asChild>
-          <Button bg="" onPress={()=>{}} title={"Home"} />
-          </Link>
           <Pressable
             style={styles.button}
             onPress={() => router.navigate("/(auth)/sign-in/page")}>
-            <Text style={(styles.text, styles.buttonText)}>Login</Text>
+            <Text style={(styles.text, styles.buttonText)}>Get started</Text>
           </Pressable>
         </View>
+      <View>
+    </View>
     </View>
   );
 }
 
 
 const styles = StyleSheet.create({
-  container:{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding:16
-      },
+   container: {
+    flexGrow: 1,
+    backgroundColor: COLORS.background,
+    padding: 16,
+    justifyContent: "center"
+  },
       
   heading: {
     fontSize: 18,
@@ -70,6 +70,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontSize:16,
+    fontWeight:'bold'
   },
   text: {
     fontSize: 16,

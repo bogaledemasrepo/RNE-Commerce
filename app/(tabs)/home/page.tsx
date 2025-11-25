@@ -1,4 +1,5 @@
 import Carosel from '@/components/carosel';
+import COLORS from '@/constants/color';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -6,7 +7,7 @@ import React from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const Home = () => {
-  return (<SafeAreaView style={{flex:1}}>
+  return (<SafeAreaView style={{flex:1,backgroundColor:COLORS.background}}>
       <ScrollView>
         <View style={{width:"100%",height:32,display:"flex",flexDirection:"row",alignItems:"center",justifyContent:"space-between",paddingHorizontal:4}}>
           <View></View>

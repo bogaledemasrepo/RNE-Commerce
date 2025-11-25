@@ -14,19 +14,44 @@ import {
 } from "react-native";
 
 import COLORS from "@/constants/color";
+import { useAuth } from "@/context/use-auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Toast } from "toastify-react-native";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsloading] = useState(false);
+  const {setUser} = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async () => {
-    //const result = await login(email, password);
-
-   // if (!result.success) Alert.alert("Error", result.error);
+  const handleSubmit =async () => {
+    setIsloading(true);
+    try {
+      const tokenPromise = await fetch('https://exp-server-collection.onrender.com/shoeshop/auth/login',{
+       method:"POST",headers:{
+        'accept': '*/*',
+        "Content-Type":"application/json"
+       }
+       ,body:`{"email":"${email}","password":"${password}"}`
+      })
+      console.log(tokenPromise);
+      if(!tokenPromise.ok){  
+          Toast.error('Error message!')
+          return; 
+        }
+      Toast.success('Login successful!')
+      const {token,user} = await tokenPromise.json();
+      AsyncStorage.setItem('token',token);
+      setUser(user)
+    } catch (error) {
+      Toast.error('Login failed. Please try again.');
+      console.log("Login error:",error);
+    }finally{
+      setIsloading(false);
+    }
+    
   };
-
-  //if (isCheckingAuth) return null;
 
   return (
     <KeyboardAvoidingView
@@ -94,8 +119,8 @@ export default function Login() {
             </View>
 
             
-            <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={false}>
-              {false ? (
+            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={isLoading}>
+              {isLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.buttonText}>Login</Text>

@@ -1,11 +1,13 @@
+import COLORS from '@/constants/color'
+import { useAuth } from '@/context/use-auth'
 import { AntDesign, Feather, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons'
-import { router } from 'expo-router'
 import React from 'react'
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const Profile = () => {
-  return (<SafeAreaView style={{flex:1}}>
+  const {user,logout} = useAuth()
+  return (<SafeAreaView style={{flex:1,backgroundColor:COLORS.background}}>
           <ScrollView style={{padding:16}}>
             <View style={{margin:"auto"}}>
               <View style={{borderRadius:100,position:"relative"}}>
@@ -13,10 +15,10 @@ const Profile = () => {
                 <AntDesign style={{position:"absolute",bottom:0,right:"20%"}}  name="cloud-upload" size={36} color="#008cffff" />
               </View>
               <View style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-                <Text style={{fontSize:18,fontWeight:"bold"}}>Bogale Demas</Text>
+                <Text style={{fontSize:18,fontWeight:"bold"}}>{user?.username}</Text>
                 <View style={{display:"flex",gap:4,flexDirection:"row",alignItems:"center"}}>
                   <Feather name="mail" size={20} color={"#858585ff"}  />
-                  <Text style={{fontSize:16,color:"#858585ff"}}>bgdm@gmail.com</Text>
+                  <Text style={{fontSize:16,color:"#858585ff"}}>{user?.email}</Text>
                 </View>
               </View>
             </View>
@@ -66,7 +68,7 @@ const Profile = () => {
               </View>
              <Pressable
                 style={[styles.button]}
-                onPress={()=>router.navigate("/")}>
+                onPress={logout}>
                   <MaterialCommunityIcons name="logout" size={24} color="#858585ff" />
                 <Text style={(styles.text, styles.buttonText)}>Logout</Text>
             </Pressable>
