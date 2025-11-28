@@ -1,6 +1,7 @@
 import { AuthProvider } from "@/context/use-auth";
 import { Stack } from "expo-router";
 import React from "react";
+import ToastManager from "toastify-react-native/components/ToastManager";
 
 export default function RootLayout() {
   return (<>
@@ -12,5 +13,6 @@ export default function RootLayout() {
       <Stack.Screen name="(model)" />
     </Stack>
     </AuthProvider>
+    <ToastManager />
   </>)
 }

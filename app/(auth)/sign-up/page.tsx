@@ -17,6 +17,7 @@ import COLORS from "@/constants/color";
 import { useAuth } from "@/context/use-auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Toast } from "toastify-react-native";
+import ToastManager from "toastify-react-native/components/ToastManager";
 
 export default function Login() {
   const [name, setName] = useState("");
@@ -27,6 +28,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit =async () => {
+    function validEmail(email:string) {
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return pattern.test(email);
+      }
+      if(!name.trim()) return Toast.error("Name is required.")
+    if(!email.trim()) return Toast.error('Email is required.');
+    if(!validEmail(email.trim())) return Toast.error('Invalid email address.');
     setIsloading(true);
     try {
       const tokenPromise = await fetch('https://exp-server-collection.onrender.com/shoeshop/auth/register',{
@@ -159,6 +167,8 @@ export default function Login() {
             </View>
           </View>
         </View>
+
+      <ToastManager />
       </View>
     </KeyboardAvoidingView>
   );

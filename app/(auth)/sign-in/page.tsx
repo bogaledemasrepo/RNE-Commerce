@@ -16,7 +16,7 @@ import {
 import COLORS from "@/constants/color";
 import { useAuth } from "@/context/use-auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Toast } from "toastify-react-native";
+import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,8 +24,17 @@ export default function Login() {
   const [isLoading, setIsloading] = useState(false);
   const {setUser} = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error,setError]=useState({email:"",name:""});
 
   const handleSubmit =async () => {
+
+    function validEmail(email:string) {
+        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return pattern.test(email);
+    }
+    if(!email.trim()) return setError((prev)=>({...prev,email:"Email is required."})); //Toast.error('Email is required.');
+    if(!validEmail(email.trim())) return setError((prev)=>({...prev,email:'Invalid email address.'}));
+
     setIsloading(true);
     try {
       const tokenPromise = await fetch('https://exp-server-collection.onrender.com/shoeshop/auth/login',{
@@ -35,7 +44,6 @@ export default function Login() {
        }
        ,body:`{"email":"${email}","password":"${password}"}`
       })
-      console.log(tokenPromise);
       if(!tokenPromise.ok){  
           Toast.error('Error message!')
           return; 
@@ -53,7 +61,7 @@ export default function Login() {
     
   };
 
-  return (
+  return (<>
     <KeyboardAvoidingView
       style={{ flex: 1}}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -73,15 +81,16 @@ export default function Login() {
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input,error.email&&{borderColor:"#df7979ff"}]}
                   placeholder="Enter your email"
                   placeholderTextColor={COLORS.placeholderText}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(text)=>{setEmail(text);if(error.email) setError((prev)=>({...prev,email:""}))}}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
               </View>
+              {error.email && <Text style={{color:"#df7979ff",fontSize:12,textAlign:"center"}}>{error.email}</Text>}
             </View>
 
             {/* PASSWORD */}
@@ -136,8 +145,11 @@ export default function Login() {
             </View>
           </View>
         </View>
+      
       </View>
     </KeyboardAvoidingView>
+    <ToastManager />
+  </>
   );
 }
 

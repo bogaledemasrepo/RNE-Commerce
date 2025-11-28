@@ -1,7 +1,9 @@
 
 import COLORS from "@/constants/color";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Toast } from "toastify-react-native";
+import ToastManager from "toastify-react-native/components/ToastManager";
 
 export default function Index() {
 
@@ -18,6 +20,12 @@ export default function Index() {
           Using the elevation style prop to apply box-shadow for iOS devices
         </Text>
       </View>
+       <Button
+        title='Show Error Toast'
+        onPress={() => {
+          Toast.error('Error message!')
+        }}
+      />
       <View style={styles.action}>
           <Pressable
             style={styles.button}
@@ -27,6 +35,7 @@ export default function Index() {
         </View>
       <View>
     </View>
+    <ToastManager />
     </View>
   );
 }
