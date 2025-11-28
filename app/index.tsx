@@ -32,6 +32,8 @@ export default function Index() {
             onPress={() => router.navigate("/(auth)/sign-in/page")}>
             <Text style={(styles.text, styles.buttonText)}>Get started</Text>
           </Pressable>
+                </View>
+            )}
         </View>
       <View>
     </View>
@@ -88,10 +90,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 0.25,
   },
-  action:{
-    width:"100%",
-    display:"flex",
-    flexDirection:"row",
-    gap:16
-  }
+//   action:{
+//     width:"100%",
+//     display:"flex",
+//     flexDirection:"row",
+//     gap:16
+//   }
 });
