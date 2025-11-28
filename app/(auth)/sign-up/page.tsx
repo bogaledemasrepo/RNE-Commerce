@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -153,11 +153,9 @@ export default function Login() {
             {/* FOOTER */}
             <View style={styles.footer}>
               <Text style={styles.footerText}>I have already an account?</Text>
-              <Link href="/(auth)/sign-in/page" asChild>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>router.back()}>
                   <Text style={styles.link}>Login</Text>
                 </TouchableOpacity>
-              </Link>
             </View>
           </View>
         </View>
