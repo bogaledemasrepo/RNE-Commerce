@@ -1,158 +1,75 @@
-import { supabase } from '@/supabase';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import React, { JSX, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-// -----------------------------------------------------------
-// NOTE: This component uses standard React/HTML elements and 
-// Tailwind CSS classes to ensure compilation in this environment.
-// The core Supabase logic remains identical to the intended setup.
-// -----------------------------------------------------------
+import COLORS from "@/constants/color";
+import { router } from "expo-router";
+import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Toast } from "toastify-react-native";
+import ToastManager from "toastify-react-native/components/ToastManager";
 
-interface StatusBoxProps {
-    session: Session | null;
-}
+export default function Index() {
 
-const StatusBox: React.FC<StatusBoxProps> = ({ session }) => {
-    return (
-        <View style={styles.container}>
-            
-            <Text>Supabase Setup (TS)</Text>
-
-            {session ? (
-                <div className="p-4 bg-green-50 border-l-4 border-green-400 rounded-lg space-y-2">
-                    <Text>User is Signed In!</Text>
-                    <Text>User ID:</Text> 
-                    <Text>{session.user.id.substring(0, 8)}...</Text> 
-                    <button
-                        onClick={() => supabase.auth.signOut()}
-                        className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition"
-                    >
-                        Sign Out
-                    </button>
-                </div>
-            ) : (
-                <View>
-                    <Text>No Active Session.</Text>
-                    <Text>Ready for Sign In/Sign Up (using an external component or form).
-                    </Text>
-                              <Pressable
+  return ( <View
+      style={styles.container}
+    >
+    <View style={[styles.card, styles.shadowProp]}>
+        <View>
+          <Text style={styles.heading}>
+            RN-E-Commerce
+          </Text>
+        </View>
+        <Text>
+          Using the elevation style prop to apply box-shadow for iOS devices
+        </Text>
+      </View>
+       <Button
+        title='Show Error Toast'
+        onPress={() => {
+          Toast.error('Error message!')
+        }}
+      />
+      <View style={styles.action}>
+          <Pressable
             style={styles.button}
-            onPress={() => () => alert('Add your sign-in form here!')}>
-            <Text style={(styles.text, styles.buttonText)}>Demo Sign In Click</Text>
+            onPress={() => router.navigate("/(auth)/sign-in/page")}>
+            <Text style={(styles.text, styles.buttonText)}>Get started</Text>
           </Pressable>
                 </View>
             )}
         </View>
-    );
-};
-
-
-export default function App(): JSX.Element {
-  const [loading, setLoading] = useState<boolean>(true);
-  // The session state can be Session object or null
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    // 1. Check for an active session on startup
-    const initialSessionCheck = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      setLoading(false);
-    };
-    initialSessionCheck();
-
-    // 2. Set up a listener for real-time auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: AuthChangeEvent, currentSession: Session | null) => {
-        setSession(currentSession);
-        // Ensure initial loading state is cleared after the first check/event
-        if (loading) setLoading(false);
-      }
-    );
-
-    // Cleanup the subscription when the component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Checking session status...</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-        <StatusBox session={session} />
-      </View>
+      <View>
+    </View>
+    <ToastManager />
+    </View>
   );
 }
 
 
-
-// import Button from "@/components/button";
-// import { Link } from "expo-router";
-// import { Pressable, StyleSheet, Text, View } from "react-native";
-
-// export default function Index() {
-//   return ( <View
-//       style={styles.container}
-//     >
-//     <View style={[styles.card, styles.shadowProp]}>
-//         <View>
-//           <Text style={styles.heading}>
-//             RN-E-Commerce
-//           </Text>
-//         </View>
-//         <Text>
-//           Using the elevation style prop to apply box-shadow for iOS devices
-//         </Text>
-//       </View>
-//       <View style={styles.action}>
-//           <Link href={"/home/page"} asChild>
-//           <Button bg="" onPress={()=>{}} title={"Home"} />
-//           </Link>
-          // <Pressable
-          //   style={styles.button}
-          //   onPress={() => console.log('pressed')}>
-          //   <Text style={(styles.text, styles.buttonText)}>Login</Text>
-          // </Pressable>
-//         </View>
-//     </View>
-//   );
-// }
-
-// // remember to import StyleSheet from react-native
 const styles = StyleSheet.create({
-  container:{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding:16
-      },
-//   heading: {
-//     fontSize: 18,
-//     fontWeight: '600',
-//     marginBottom: 13,
-//   },
-//   card: {
-//     backgroundColor: 'white',
-//     borderRadius: 8,
-//     paddingVertical: 45,
-//     paddingHorizontal: 25,
-//     width: '100%',
-//     marginVertical: 10,
-//   },
-//   shadowProp: {
-//     shadowColor: '#171717',
-//     shadowOffset: {width: -2, height: 4},
-//     shadowOpacity: 0.2,
-//     shadowRadius: 3,
-//   },
+   container: {
+    flexGrow: 1,
+    backgroundColor: COLORS.background,
+    padding: 16,
+    justifyContent: "center"
+  },
+      
+  heading: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 13,
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingVertical: 45,
+    paddingHorizontal: 25,
+    width: '100%',
+    marginVertical: 10,
+  },
+  shadowProp: {
+    shadowColor: '#171717',
+    shadowOffset: {width: -2, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
   button: {
     backgroundColor: '#4830D3',
     alignItems: 'center',
@@ -164,6 +81,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontSize:16,
+    fontWeight:'bold'
   },
   text: {
     fontSize: 16,
