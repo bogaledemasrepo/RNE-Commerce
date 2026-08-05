@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({email:"bogidemas@gmail.com",avatar:"",username:"Bogale Demas"});
+  const [user, setUser] = useState<User | null>(null);
 
   async function logout(): Promise<void> {
     try {

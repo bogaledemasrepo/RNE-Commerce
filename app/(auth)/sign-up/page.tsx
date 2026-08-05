@@ -1,291 +1,383 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View
 } from "react-native";
+import ToastManager, { Toast } from "toastify-react-native";
 
 import COLORS from "@/constants/color";
 import { useAuth } from "@/context/use-auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Toast } from "toastify-react-native";
-import ToastManager from "toastify-react-native/components/ToastManager";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Login() {
+interface FormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+}
+
+export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsloading] = useState(false);
-  const {setUser} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const handleSubmit =async () => {
-    function validEmail(email:string) {
-      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return pattern.test(email);
-      }
-      if(!name.trim()) return Toast.error("Name is required.")
-    if(!email.trim()) return Toast.error('Email is required.');
-    if(!validEmail(email.trim())) return Toast.error('Invalid email address.');
-    setIsloading(true);
-    try {
-      const tokenPromise = await fetch('https://exp-server-collection.onrender.com/shoeshop/auth/register',{
-       method:"POST",headers:{
-        'accept': '*/*',
-        "Content-Type":"application/json"
-       }
-       ,body:`{"name":"${name}","email":"${email}","password":"${password}"}`
-      })
-      console.log(tokenPromise);
-      if(!tokenPromise.ok){  
-          Toast.error('Error message!')
-          return; 
-        }
-      Toast.success('Registration successful!')
-      const {token,user} = await tokenPromise.json();
-      AsyncStorage.setItem('token',token);
-      setUser(user)
-    } catch (error) {
-      Toast.error('Registration failed. Please try again.');
-      console.log("Registration error:",error);
-      
-    }finally{
-      setIsloading(false);
+  const { setUser } = useAuth();
+
+  const validate = () => {
+    const newErrors: FormErrors = {};
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name.trim()) {
+      newErrors.name = "Full name is required.";
     }
-    
+
+    if (!email.trim()) {
+      newErrors.email = "Email address is required.";
+    } else if (!emailPattern.test(email.trim())) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required.";
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        "https://exp-server-collection.onrender.com/shoeshop/auth/register",
+        {
+          method: "POST",
+          headers: {
+            accept: "*/*",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim(),
+            password: password,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        Toast.error("Registration failed. Please check your credentials.");
+        return;
+      }
+
+      const { token, user } = await response.json();
+      await AsyncStorage.setItem("token", token);
+      setUser(user);
+      Toast.success("Account created successfully!");
+      router.replace("/(tabs)/home/page");
+    } catch (error) {
+      Toast.error("Network error. Please try again.");
+      console.log("Registration error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1}}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View style={[styles.container]}>
-        <View style={styles.card}>
-          <Text style={{fontSize:18,fontWeight:"bold",marginVertical:16,color:"#1976D2",textAlign:"center"}}>Register to RNE-Commerce</Text>
-          <View style={styles.formContainer}>
-            {/* USERNAME */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>User name</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="person-outline"
-                  size={20}
-                  color={COLORS.primary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter user name"
-                  placeholderTextColor={COLORS.placeholderText}
-                  value={name}
-                  onChangeText={setName}
-                  keyboardType="default"
-                  autoCapitalize="none"
-                />
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Header / Branding */}
+            <View style={styles.header}>
+              <View style={styles.logoContainer}>
+                <Ionicons name="person-add" size={30} color={COLORS.primary || "#4830D3"} />
               </View>
-            </View>
-            {/* EMAIL */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="mail-outline"
-                  size={20}
-                  color={COLORS.primary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your email"
-                  placeholderTextColor={COLORS.placeholderText}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
+              <Text style={styles.title}>Create Account</Text>
+              <Text style={styles.subtitle}>Sign up to start your shopping journey</Text>
             </View>
 
-            {/* PASSWORD */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputContainer}>
-                {/* LEFT ICON */}
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={20}
-                  color={COLORS.primary}
-                  style={styles.inputIcon}
-                />
-                {/* INPUT */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your password"
-                  placeholderTextColor={COLORS.placeholderText}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                />
-
-                <TouchableOpacity
-                  onPress={() => setShowPassword(!showPassword)}
-                  style={styles.eyeIcon}
+            {/* Form */}
+            <View style={styles.form}>
+              {/* FULL NAME FIELD */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Full Name</Text>
+                <View
+                  style={[
+                    styles.inputContainer,
+                    errors.name && styles.inputContainerError,
+                  ]}
                 >
                   <Ionicons
-                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    name="person-outline"
                     size={20}
-                    color={COLORS.primary}
+                    color={errors.name ? "#EF4444" : "#6B7280"}
+                    style={styles.inputIcon}
                   />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="John Doe"
+                    placeholderTextColor="#9CA3AF"
+                    value={name}
+                    onChangeText={(text) => {
+                      setName(text);
+                      if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+                    }}
+                    autoCapitalize="words"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+              </View>
+
+              {/* EMAIL FIELD */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <View
+                  style={[
+                    styles.inputContainer,
+                    errors.email && styles.inputContainerError,
+                  ]}
+                >
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={errors.email ? "#EF4444" : "#6B7280"}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="name@example.com"
+                    placeholderTextColor="#9CA3AF"
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+                    }}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+                {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+              </View>
+
+              {/* PASSWORD FIELD */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Password</Text>
+                <View
+                  style={[
+                    styles.inputContainer,
+                    errors.password && styles.inputContainerError,
+                  ]}
+                >
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={errors.password ? "#EF4444" : "#6B7280"}
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="••••••••"
+                    placeholderTextColor="#9CA3AF"
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                    }}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeIcon}
+                    hitSlop={8}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color="#6B7280"
+                    />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+              </View>
+
+              {/* SUBMIT BUTTON */}
+              <TouchableOpacity
+                style={[styles.button, isLoading && styles.buttonDisabled]}
+                onPress={handleSubmit}
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Create Account</Text>
+                )}
+              </TouchableOpacity>
+
+              {/* FOOTER */}
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Already have an account?</Text>
+                <TouchableOpacity onPress={() => router.back()}>
+                  <Text style={styles.link}>Sign In</Text>
                 </TouchableOpacity>
               </View>
             </View>
-
-            
-            <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={isLoading}>
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Register</Text>
-              )}
-            </TouchableOpacity>
-
-            {/* FOOTER */}
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>I have already an account?</Text>
-                <TouchableOpacity onPress={()=>router.back()}>
-                  <Text style={styles.link}>Login</Text>
-                </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
       <ToastManager />
-      </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-
-
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: COLORS.background,
-    padding: 16,
-    justifyContent: "center"
-  },
-  scrollViewStyle: {
+  safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.background || "#F9FAFB",
   },
-  topIllustration: {
-    alignItems: "center",
-    width: "100%",
+  keyboardView: {
+    flex: 1,
   },
-  illustrationImage: {
-    width: width * 0.75,
-    height: width * 0.65,
-  },
-  card: {
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    marginTop: -24,
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 32,
   },
   header: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 28,
+  },
+  logoContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: "rgba(72, 48, 211, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
   },
   title: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: "700",
-    color: COLORS.textPrimary,
-    marginBottom: 8,
+    color: "#111827",
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: "center",
+    fontSize: 14,
+    color: "#6B7280",
   },
-  formContainer: {
-    marginBottom: 16,
+  form: {
+    width: "100%",
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 18,
   },
   label: {
     fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
     marginBottom: 8,
-    color: COLORS.textPrimary,
-    fontWeight: "500",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.inputBackground,
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingHorizontal: 12,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 14,
+    height: 52,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  inputContainerError: {
+    borderColor: "#EF4444",
+    backgroundColor: "#FEF2F2",
   },
   inputIcon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    height: 48,
-    color: COLORS.textDark,
+    height: "100%",
+    color: "#111827",
+    fontSize: 15,
   },
   eyeIcon: {
-    padding: 8,
+    padding: 4,
+  },
+  errorText: {
+    color: "#EF4444",
+    fontSize: 12,
+    marginTop: 6,
+    fontWeight: "500",
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primary || "#4830D3",
     borderRadius: 12,
-    height: 50,
+    height: 52,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 8,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: COLORS.primary || "#4830D3",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
   },
   buttonText: {
-    color: COLORS.white,
+    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: 24,
+    gap: 6,
   },
   footerText: {
-    color: COLORS.textSecondary,
-    marginRight: 5,
+    color: "#6B7280",
+    fontSize: 14,
   },
   link: {
-    color: COLORS.primary,
-    fontWeight: "600",
+    color: COLORS.primary || "#4830D3",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });
