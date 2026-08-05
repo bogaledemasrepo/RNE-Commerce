@@ -238,7 +238,7 @@ export default function CartPage() {
 
         <TouchableOpacity
           style={styles.checkoutBtn}
-          onPress={() => router.navigate("/(tabs)/cart/checkout" as any)}
+          onPress={() => router.navigate("/(tabs)/cart/checkout/page" as any)}
           activeOpacity={0.85}
         >
           <Text style={styles.checkoutBtnText}>Checkout</Text>

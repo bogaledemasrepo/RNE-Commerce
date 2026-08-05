@@ -39,7 +39,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="cart/page"
+        name="cart"
         options={{
           title: "Cart",
           tabBarLabel: "Cart",
@@ -67,7 +67,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile/page"
+        name="profile"
         options={{
           title: "Profile",
           tabBarLabel: "Profile",
