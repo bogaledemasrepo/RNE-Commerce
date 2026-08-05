@@ -81,9 +81,10 @@ export default function Register() {
           }),
         }
       );
+      console.log("Registration response status:", response.status);
 
       if (!response.ok) {
-        Toast.error("Registration failed. Please check your credentials.");
+        Toast.error("Registration failed.");
         return;
       }
 
