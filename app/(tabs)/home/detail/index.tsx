@@ -11,7 +11,7 @@ import COLORS from "@/constants/color";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Login() {
+export default function Detail() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background ,padding:8,justifyContent:"center",flexDirection:"column",gap:16}}>
