@@ -2,8 +2,8 @@ import * as React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel, {
-    ICarouselInstance,
-    Pagination,
+  ICarouselInstance,
+  Pagination,
 } from "react-native-reanimated-carousel";
  
 const data = [...new Array(6).keys()];
@@ -28,7 +28,7 @@ function Carosel() {
     <View style={{ flex: 1 }}>
       <Carousel
         ref={ref}
-        width={width - 16}
+        width={width - 20}
         height={width / 3}
         data={data}
         autoPlay
