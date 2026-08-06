@@ -101,11 +101,12 @@ const Profile = () => {
         {/* User Profile Card */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarWrapper}>
-            <Image
-              style={styles.avatarImage}
-              resizeMode="cover"
-              source={require('../../../assets/images/man.png')}
-            />
+            {user?.avatar ?
+              <Image
+                style={styles.avatarImage}
+                resizeMode="cover"
+                source={{ uri: user.avatar }}
+              /> : <MaterialIcons name="verified-user" size={72} />}
             <Pressable style={styles.editAvatarBtn} hitSlop={6}>
               <Ionicons name="camera" size={16} color="#FFFFFF" />
             </Pressable>
