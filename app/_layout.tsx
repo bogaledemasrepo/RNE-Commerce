@@ -13,6 +13,7 @@ export default function RootLayout() {
       <Stack.Screen name="(guest)/page" />
     </Stack>
     </AuthProvider>
+     {/* <StatusBar style="light" /> */}
     <ToastManager />
   </>)
 }

@@ -8,7 +8,8 @@
     "scheme": "rnecommerce",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bogitech.RNECommerce"
     },
     "android": {
       "adaptiveIcon": {

@@ -1,4 +1,4 @@
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -63,13 +63,13 @@ const GuestCollections = () => {
             </Pressable>
           </View>
 
-          <Pressable
+          {/* <Pressable
             style={styles.viewAllBtn}
             onPress={() => router.navigate('/(tabs)/home/detail')}
           >
             <Text style={styles.viewAllText}>View all</Text>
             <FontAwesome name="angle-right" size={16} color="#4830D3" />
-          </Pressable>
+          </Pressable> */}
         </View>
 
         {/* Product Grid */}

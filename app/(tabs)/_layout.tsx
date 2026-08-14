@@ -4,6 +4,7 @@ import { Platform, StyleSheet } from "react-native";
 
 import COLORS from "@/constants/color";
 import { useAuth } from "@/context/use-auth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ export default function TabsLayout() {
     return <Redirect href="/(auth)/sign-in/page" />;
   }
 
-  return (
+  return (<SafeAreaView style={{flex:1}}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -81,6 +82,7 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+  </SafeAreaView>
   );
 }
 
