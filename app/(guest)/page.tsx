@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Dimensions,
@@ -16,29 +15,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
+import { PaginatedProductResponse } from '../types';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 40) / 2; // Precise 2-column layout width with padding
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stockQuantity: number;
-  imageUrl: string;
-  categoryId: number;
-  categoryName: string;
-}
-
-export interface PaginatedProductResponse {
-  content: Product[];
-  pageNumber: number;
-  pageSize: number;
-  totalElements: number;
-  totalPages: number;
-  last: boolean;
-}
 
 const GuestCollections = () => {
   const [activeTab, setActiveTab] = useState<'forYou' | 'bestSellers'>('forYou');
@@ -97,7 +77,6 @@ const GuestCollections = () => {
             return (
               <Pressable
                 key={item.id}
-                onPress={() => router.navigate('/(tabs)/home/detail')}
                 style={({ pressed }) => [styles.productCard, pressed && styles.cardPressed]}
               >
                 <ImageBackground

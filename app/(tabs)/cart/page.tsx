@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import COLORS from '@/constants/color';
+import { useCart } from '@/context/use-cart';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CartItem {
@@ -47,35 +48,35 @@ const MOCK_CART: CartItem[] = [
 ];
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(MOCK_CART);
+  const {
+    items,
+    addItem,
+    clearCart,
+    totalItems,
+    totalPrice,
+    decrementQuantity,
+    incrementQuantity,
+    removeItem,
+  } = useCart();
+  // const [cartItems, setCartItems] = useState<CartItem[]>(MOCK_CART);
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
 
   // Quantity Handler
-  const updateQuantity = (id: string, action: 'increase' | 'decrease') => {
-    setCartItems(
-      (prevItems) =>
-        prevItems
-          .map((item) => {
-            if (item.id === id) {
-              const newQty = action === 'increase' ? item.quantity + 1 : item.quantity - 1;
-              return newQty > 0 ? { ...item, quantity: newQty } : null;
-            }
-            return item;
-          })
-          .filter(Boolean) as CartItem[]
-    );
+  const updateQuantity = (id: number, action: 'increase' | 'decrease') => {
+    if (action == 'decrease') decrementQuantity(id);
+    if (action == 'increase') incrementQuantity(id);
   };
 
   // Item Removal Confirmation
-  const removeItem = (id: string) => {
+  const hanleRemoveItem = (id: number) => {
     Alert.alert('Remove Item', 'Are you sure you want to remove this item from your cart?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
         style: 'destructive',
         onPress: () => {
-          setCartItems((prev) => prev.filter((item) => item.id !== id));
+          removeItem(id);
         },
       },
     ]);
@@ -92,13 +93,13 @@ export default function CartPage() {
   };
 
   // Financial Calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const discountAmount = subtotal * discount;
   const shippingFee = subtotal > 0 ? 15.0 : 0.0;
   const grandTotal = subtotal - discountAmount + shippingFee;
 
   // Empty Cart Component
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.emptyContainer}>
@@ -126,29 +127,29 @@ export default function CartPage() {
       {/* Page Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Shopping Cart</Text>
-        <Text style={styles.headerCount}>{cartItems.length} items</Text>
+        <Text style={styles.headerCount}>{items.length} items</Text>
       </View>
 
       <FlatList
-        data={cartItems}
-        keyExtractor={(item) => item.id}
+        data={items}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <View style={styles.cartCard}>
-            <Image source={{ uri: item.image }} style={styles.productImage} />
+            <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
 
             <View style={styles.cardDetails}>
               <View style={styles.cardHeaderRow}>
                 <Text style={styles.productName} numberOfLines={1}>
                   {item.name}
                 </Text>
-                <Pressable onPress={() => removeItem(item.id)} hitSlop={8}>
+                <Pressable onPress={() => hanleRemoveItem(item.id)} hitSlop={8}>
                   <Feather name="trash-2" size={18} color="#EF4444" />
                 </Pressable>
               </View>
 
-              <Text style={styles.productVariant}>{item.variant}</Text>
+              <Text style={styles.productVariant}>{'item.variant'}</Text>
 
               <View style={styles.cardFooterRow}>
                 <Text style={styles.productPrice}>${(item.price * item.quantity).toFixed(2)}</Text>

@@ -1,14 +1,8 @@
+import { User } from '@/app/types';
 import { API_BASE_URL } from '@/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
-
-interface User {
-  name: string;
-  email: string;
-  password?: string; // Optional, not stored in state
-  avatar: string;
-}
 
 interface AuthContextType {
   user: User | null;

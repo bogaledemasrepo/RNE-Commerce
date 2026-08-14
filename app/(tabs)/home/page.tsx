@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PaginatedProductResponse } from '@/app/(guest)/page';
+import { PaginatedProductResponse } from '@/app/types';
 import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
@@ -57,7 +57,6 @@ const Home = () => {
       );
       const data: PaginatedProductResponse = await response.json();
       setProductData(data);
-      console.log(data);
     }
     fetchCategories();
     fetchCollections();
@@ -166,10 +165,7 @@ const Home = () => {
             </Pressable>
           </View>
 
-          <TouchableOpacity
-            style={styles.viewAllBtn}
-            onPress={() => router.navigate('/(tabs)/home/detail' as any)}
-          >
+          <TouchableOpacity style={styles.viewAllBtn}>
             <Text style={styles.viewAllText}>View all</Text>
             <FontAwesome name="angle-right" size={16} color={COLORS.primary || '#4830D3'} />
           </TouchableOpacity>
@@ -182,7 +178,12 @@ const Home = () => {
             return (
               <Pressable
                 key={item.id}
-                onPress={() => router.navigate('/(tabs)/home/detail' as any)}
+                onPress={() =>
+                  router.push({
+                    pathname: '/home/detail/[slug]',
+                    params: { slug: item.id, tab: 'settings' },
+                  })
+                }
                 style={({ pressed }) => [styles.productCard, pressed && styles.cardPressed]}
               >
                 <ImageBackground
