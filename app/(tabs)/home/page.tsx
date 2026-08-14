@@ -1,7 +1,7 @@
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dimensions,
   ImageBackground,
@@ -11,78 +11,66 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PaginatedProductResponse } from '@/app/(guest)/page';
 import Carosel from '@/components/carosel';
+import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 44) / 2; // Precise 2-column calculation
 
-const CATEGORIES = [
-  { id: '1', name: 'Shoes', icon: 'footsteps-outline' },
-  { id: '2', name: 'Apparel', icon: 'shirt-outline' },
-  { id: '3', name: 'Watches', icon: 'watch-outline' },
-  { id: '4', name: 'Bags', icon: 'briefcase-outline' },
-  { id: '5', name: 'Accessories', icon: 'glasses-outline' },
-  { id: '6', name: 'Jewelry', icon: 'diamond-outline' },
-];
-
-const PRODUCTS = [
-  {
-    id: '1',
-    name: 'Minimalist Sneaker',
-    price: '$180.00',
-    category: 'Footwear',
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=500&auto=format&fit=crop',
-  },
-  {
-    id: '2',
-    name: 'Heritage Hoodie',
-    price: '$135.00',
-    category: 'Apparel',
-    image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500&auto=format&fit=crop',
-  },
-  {
-    id: '3',
-    name: 'Classic Watch',
-    price: '$250.00',
-    category: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=500&auto=format&fit=crop',
-  },
-  {
-    id: '4',
-    name: 'Denim Jacket',
-    price: '$145.00',
-    category: 'Outerwear',
-    image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=500&auto=format&fit=crop',
-  },
-];
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail: string;
+  description: string;
+}
 
 const Home = () => {
   const { user } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [activeFilter, setActiveFilter] = useState<'forYou' | 'bestSellers'>('forYou');
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const toggleFavorite = (id: string) => {
+  const [productData, setProductData] = useState<PaginatedProductResponse>();
+  const toggleFavorite = (id: number) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  useEffect(() => {
+    async function fetchCategories() {
+      const response = await fetch(API_BASE_URL + '/categories');
+      const data = await response.json();
+      setCategories(data);
+      console.log(data);
+    }
+
+    async function fetchCollections() {
+      const response = await fetch(
+        API_BASE_URL + '/products/page?page=0&size=10&sortBy=id&sortDir=asc'
+      );
+      const data: PaginatedProductResponse = await response.json();
+      setProductData(data);
+      console.log(data);
+    }
+    fetchCategories();
+    fetchCollections();
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Top Header Bar */}
         <View style={styles.headerRow}>
           <View style={styles.userGreeting}>
             <Text style={styles.greetingSub}>Welcome back 👋</Text>
-            <Text style={styles.greetingName}>{user?.username || 'Guest Customer'}</Text>
+            <Text style={styles.greetingName}>{user?.name}</Text>
           </View>
 
           <TouchableOpacity
@@ -119,32 +107,24 @@ const Home = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoryList}
         >
-          {CATEGORIES.map((item) => {
-            const isSelected = selectedCategory === item.id;
+          {categories.map((item) => {
+            const isSelected = selectedCategory === item.id.toString();
             return (
               <Pressable
                 key={item.id}
-                onPress={() => setSelectedCategory(isSelected ? null : item.id)}
+                onPress={() => setSelectedCategory(isSelected ? null : item.id.toString())}
                 style={styles.categoryItem}
               >
                 <View
-                  style={[
-                    styles.categoryIconCircle,
-                    isSelected && styles.categoryIconCircleActive,
-                  ]}
+                  style={[styles.categoryIconCircle, isSelected && styles.categoryIconCircleActive]}
                 >
                   <Ionicons
-                    name={item.icon as any}
+                    name={'accessibility'}
                     size={22}
                     color={isSelected ? '#FFFFFF' : '#374151'}
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.categoryLabel,
-                    isSelected && styles.categoryLabelActive,
-                  ]}
-                >
+                <Text style={[styles.categoryLabel, isSelected && styles.categoryLabelActive]}>
                   {item.name}
                 </Text>
               </Pressable>
@@ -164,12 +144,7 @@ const Home = () => {
               onPress={() => setActiveFilter('forYou')}
               style={[styles.chip, activeFilter === 'forYou' && styles.chipActive]}
             >
-              <Text
-                style={[
-                  styles.chipText,
-                  activeFilter === 'forYou' && styles.chipTextActive,
-                ]}
-              >
+              <Text style={[styles.chipText, activeFilter === 'forYou' && styles.chipTextActive]}>
                 For You
               </Text>
             </Pressable>
@@ -184,10 +159,7 @@ const Home = () => {
                 color={activeFilter === 'bestSellers' ? '#FFFFFF' : '#6B7280'}
               />
               <Text
-                style={[
-                  styles.chipText,
-                  activeFilter === 'bestSellers' && styles.chipTextActive,
-                ]}
+                style={[styles.chipText, activeFilter === 'bestSellers' && styles.chipTextActive]}
               >
                 Best Sellers
               </Text>
@@ -205,19 +177,16 @@ const Home = () => {
 
         {/* Product Grid */}
         <View style={styles.gridContainer}>
-          {PRODUCTS.map((item) => {
+          {productData?.content.map((item) => {
             const isFav = !!favorites[item.id];
             return (
               <Pressable
                 key={item.id}
                 onPress={() => router.navigate('/(tabs)/home/detail' as any)}
-                style={({ pressed }) => [
-                  styles.productCard,
-                  pressed && styles.cardPressed,
-                ]}
+                style={({ pressed }) => [styles.productCard, pressed && styles.cardPressed]}
               >
                 <ImageBackground
-                  source={{ uri: item.image }}
+                  source={{ uri: item.imageUrl }}
                   style={styles.cardBackground}
                   imageStyle={styles.cardImageStyle}
                 >
