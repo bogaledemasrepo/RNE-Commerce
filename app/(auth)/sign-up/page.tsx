@@ -1,7 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useState } from "react";
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -13,13 +13,14 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
-} from "react-native";
-import ToastManager, { Toast } from "toastify-react-native";
+  View,
+} from 'react-native';
+import ToastManager, { Toast } from 'toastify-react-native';
 
-import COLORS from "@/constants/color";
-import { useAuth } from "@/context/use-auth";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { API_BASE_URL } from '@/constants';
+import COLORS from '@/constants/color';
+import { useAuth } from '@/context/use-auth';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface FormErrors {
   name?: string;
@@ -28,9 +29,9 @@ interface FormErrors {
 }
 
 export default function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -42,19 +43,19 @@ export default function Register() {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!name.trim()) {
-      newErrors.name = "Full name is required.";
+      newErrors.name = 'Full name is required.';
     }
 
     if (!email.trim()) {
-      newErrors.email = "Email address is required.";
+      newErrors.email = 'Email address is required.';
     } else if (!emailPattern.test(email.trim())) {
-      newErrors.email = "Please enter a valid email address.";
+      newErrors.email = 'Please enter a valid email address.';
     }
 
     if (!password) {
-      newErrors.password = "Password is required.";
+      newErrors.password = 'Password is required.';
     } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters.";
+      newErrors.password = 'Password must be at least 6 characters.';
     }
 
     setErrors(newErrors);
@@ -66,36 +67,46 @@ export default function Register() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "https://exp-server-collection.onrender.com/shoeshop/auth/register",
-        {
-          method: "POST",
-          headers: {
-            accept: "*/*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            email: email.trim(),
-            password: password,
-          }),
-        }
-      );
-      console.log("Registration response status:", response.status);
+      const response = await fetch(API_BASE_URL + '/auth/register', {
+        method: 'POST',
+        headers: {
+          accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: name.trim().split(' ')[0],
+          lastName: name.trim().split(' ')[1],
+          email: email.trim(),
+          password: password,
+        }),
+      });
 
       if (!response.ok) {
-        Toast.error("Registration failed.");
+        Toast.error('Invalid email or password.');
         return;
       }
 
-      const { token, user } = await response.json();
-      await AsyncStorage.setItem("token", token);
-      setUser(user);
-      Toast.success("Account created successfully!");
-      router.replace("/(tabs)/home/page");
+      const { token } = await response.json();
+
+      const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (userResponse.ok) {
+        const user = await userResponse.json();
+
+        setUser(user);
+        Toast.success('Registerd successful!');
+        router.replace('/(tabs)/home/page');
+      }
+
+      AsyncStorage.setItem('token', token);
     } catch (error) {
-      Toast.error("Network error. Please try again.");
-      console.log("Registration error:", error);
+      Toast.error('Network error. Please try again.');
+      console.log('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +116,7 @@ export default function Register() {
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
@@ -116,7 +127,7 @@ export default function Register() {
             {/* Header / Branding */}
             <View style={styles.header}>
               <View style={styles.logoContainer}>
-                <Ionicons name="person-add" size={30} color={COLORS.primary || "#4830D3"} />
+                <Ionicons name="person-add" size={30} color={COLORS.primary || '#4830D3'} />
               </View>
               <Text style={styles.title}>Create Account</Text>
               <Text style={styles.subtitle}>Sign up to start your shopping journey</Text>
@@ -127,16 +138,11 @@ export default function Register() {
               {/* FULL NAME FIELD */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Full Name</Text>
-                <View
-                  style={[
-                    styles.inputContainer,
-                    errors.name && styles.inputContainerError,
-                  ]}
-                >
+                <View style={[styles.inputContainer, errors.name && styles.inputContainerError]}>
                   <Ionicons
                     name="person-outline"
                     size={20}
-                    color={errors.name ? "#EF4444" : "#6B7280"}
+                    color={errors.name ? '#EF4444' : '#6B7280'}
                     style={styles.inputIcon}
                   />
                   <TextInput
@@ -158,16 +164,11 @@ export default function Register() {
               {/* EMAIL FIELD */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Email Address</Text>
-                <View
-                  style={[
-                    styles.inputContainer,
-                    errors.email && styles.inputContainerError,
-                  ]}
-                >
+                <View style={[styles.inputContainer, errors.email && styles.inputContainerError]}>
                   <Ionicons
                     name="mail-outline"
                     size={20}
-                    color={errors.email ? "#EF4444" : "#6B7280"}
+                    color={errors.email ? '#EF4444' : '#6B7280'}
                     style={styles.inputIcon}
                   />
                   <TextInput
@@ -191,15 +192,12 @@ export default function Register() {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Password</Text>
                 <View
-                  style={[
-                    styles.inputContainer,
-                    errors.password && styles.inputContainerError,
-                  ]}
+                  style={[styles.inputContainer, errors.password && styles.inputContainerError]}
                 >
                   <Ionicons
                     name="lock-closed-outline"
                     size={20}
-                    color={errors.password ? "#EF4444" : "#6B7280"}
+                    color={errors.password ? '#EF4444' : '#6B7280'}
                     style={styles.inputIcon}
                   />
                   <TextInput
@@ -219,7 +217,7 @@ export default function Register() {
                     hitSlop={8}
                   >
                     <Ionicons
-                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                       size={20}
                       color="#6B7280"
                     />
@@ -261,97 +259,97 @@ export default function Register() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background || "#F9FAFB",
+    backgroundColor: COLORS.background || '#F9FAFB',
   },
   keyboardView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 32,
   },
   header: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 28,
   },
   logoContainer: {
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: "rgba(72, 48, 211, 0.1)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: 'rgba(72, 48, 211, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
   title: {
     fontSize: 26,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 14,
-    color: "#6B7280",
+    color: '#6B7280',
   },
   form: {
-    width: "100%",
+    width: '100%',
   },
   inputGroup: {
     marginBottom: 18,
   },
   label: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+    fontWeight: '600',
+    color: '#374151',
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: '#E5E7EB',
     paddingHorizontal: 14,
     height: 52,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 2,
     elevation: 1,
   },
   inputContainerError: {
-    borderColor: "#EF4444",
-    backgroundColor: "#FEF2F2",
+    borderColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
   },
   inputIcon: {
     marginRight: 10,
   },
   input: {
     flex: 1,
-    height: "100%",
-    color: "#111827",
+    height: '100%',
+    color: '#111827',
     fontSize: 15,
   },
   eyeIcon: {
     padding: 4,
   },
   errorText: {
-    color: "#EF4444",
+    color: '#EF4444',
     fontSize: 12,
     marginTop: 6,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   button: {
-    backgroundColor: COLORS.primary || "#4830D3",
+    backgroundColor: COLORS.primary || '#4830D3',
     borderRadius: 12,
     height: 52,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 8,
-    shadowColor: COLORS.primary || "#4830D3",
+    shadowColor: COLORS.primary || '#4830D3',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -361,24 +359,24 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 24,
     gap: 6,
   },
   footerText: {
-    color: "#6B7280",
+    color: '#6B7280',
     fontSize: 14,
   },
   link: {
-    color: COLORS.primary || "#4830D3",
+    color: COLORS.primary || '#4830D3',
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 });

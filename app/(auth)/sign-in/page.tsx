@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
+import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -49,36 +50,68 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const login = async (email: string, password: string) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password, device_name: 'Windows 10' }),
+      });
+      const { token } = await res.json();
+      if (res.ok) {
+        const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        });
+
+        const user = await userResponse.json();
+        localStorage.setItem('token', token);
+        setUser(user);
+      } else {
+        throw new Error('Login failed');
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Login failed');
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validate()) return;
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        'https://exp-server-collection.onrender.com/shoeshop/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            accept: '*/*',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email.trim(),
-            password: password,
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
 
       if (!response.ok) {
         Toast.error('Invalid email or password.');
         return;
       }
 
-      const { token, user } = await response.json();
-      await AsyncStorage.setItem('token', token);
-      setUser(user);
-      Toast.success('Login successful!');
-      router.replace('/(tabs)/home/page');
+      const { token } = await response.json();
+
+      const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      });
+      if (userResponse.ok) {
+        const user = await userResponse.json();
+
+        setUser(user);
+        Toast.success('Login successful!');
+        router.replace('/(tabs)/home/page');
+      }
+
+      AsyncStorage.setItem('token', token);
     } catch (error) {
       Toast.error('Login failed. Please check your network connection.');
       console.log('Login error:', error);

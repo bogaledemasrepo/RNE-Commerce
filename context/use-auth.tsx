@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
@@ -11,18 +12,19 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  setUser:(data:User|null)=>void;
+  setUser: (data: User | null) => void;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  setUser:(data:User|null)=>{},
+  setUser: (data: User | null) => {},
   logout: () => Promise.resolve(),
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>({email:"bogidemas@gmail.com",avatar:"",username:"Bogale Demas"});
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   async function logout(): Promise<void> {
     try {
@@ -32,27 +34,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       Alert.alert('Error', 'Failed to log out');
     }
   }
-
   useEffect(() => {
-    async function getUserFromSession() {
+    let isMounted = true;
+
+    async function initializeAuth() {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+      if (!token) {
+        if (isMounted) setIsLoading(false);
+        return;
+      }
+
       try {
-        const storedUser = await AsyncStorage.getItem('appUser');
-        if (storedUser && storedUser !== '') {
-          const parsedUser = JSON.parse(storedUser) as User;
-          setUser(parsedUser);
+        const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (isMounted) setUser(userData);
+        } else {
+          if (isMounted) setUser(null);
         }
-      } catch (error) {
-        console.error('Failed to load user from AsyncStorage:', error);
+      } catch {
+        if (isMounted) setUser(null);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
-    getUserFromSession();
-  }, []); // Removed `user` from dependencies to prevent infinite loop
 
-  return (
-    <AuthContext.Provider value={{ user,setUser, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    initializeAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  return <AuthContext.Provider value={{ user, setUser, logout }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
