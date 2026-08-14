@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dimensions,
   ImageBackground,
@@ -14,37 +14,55 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Carosel from '@/components/carosel';
+import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 40) / 2; // Precise 2-column layout width with padding
 
-// Mock product data for clean rendering
-const MOCK_PRODUCTS = [
-  { id: '1', name: 'Minimalist Hoodie', price: '$120.00', image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500&auto=format&fit=crop' },
-  { id: '2', name: 'Leather Sneaker', price: '$180.00', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=500&auto=format&fit=crop' },
-  { id: '3', name: 'Classic Watch', price: '$250.00', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=500&auto=format&fit=crop' },
-  { id: '4', name: 'Denim Jacket', price: '$145.00', image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=500&auto=format&fit=crop' },
-  { id: '5', name: 'Minimalist Hoodie', price: '$120.00', image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500&auto=format&fit=crop' },
-  { id: '6', name: 'Leather Sneaker', price: '$180.00', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=500&auto=format&fit=crop' },
-  { id: '7', name: 'Classic Watch', price: '$250.00', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=500&auto=format&fit=crop' },
-  { id: '8', name: 'Denim Jacket', price: '$145.00', image: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?q=80&w=500&auto=format&fit=crop' },
-  { id: '9', name: 'Minimalist Hoodie', price: '$120.00', image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500&auto=format&fit=crop' },
-  { id: '10', name: 'Leather Sneaker', price: '$180.00', image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=500&auto=format&fit=crop' },
-];
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stockQuantity: number;
+  imageUrl: string;
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface PaginatedProductResponse {
+  content: Product[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
 
 const GuestCollections = () => {
   const [activeTab, setActiveTab] = useState<'forYou' | 'bestSellers'>('forYou');
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+  const [productData, setProductData] = useState<PaginatedProductResponse>();
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  useEffect(() => {
+    async function fetchCollections() {
+      const response = await fetch(
+        API_BASE_URL + '/products/page?page=0&size=10&sortBy=id&sortDir=asc'
+      );
+      const data: PaginatedProductResponse = await response.json();
+      setProductData(data);
+      console.log(data);
+    }
+    fetchCollections();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
         {/* Carousel Section */}
         <View style={styles.carouselContainer}>
           <Carosel />
@@ -58,7 +76,7 @@ const GuestCollections = () => {
               style={[styles.chip, activeTab === 'forYou' && styles.chipActive]}
             >
               <Text style={[styles.chipText, activeTab === 'forYou' && styles.chipTextActive]}>
-               Guest Collections
+                Guest Collections
               </Text>
             </Pressable>
           </View>
@@ -74,19 +92,16 @@ const GuestCollections = () => {
 
         {/* Product Grid */}
         <View style={styles.gridContainer}>
-          {MOCK_PRODUCTS.map((item) => {
+          {productData?.content.map((item) => {
             const isFav = !!favorites[item.id];
             return (
               <Pressable
                 key={item.id}
                 onPress={() => router.navigate('/(tabs)/home/detail')}
-                style={({ pressed }) => [
-                  styles.productCard,
-                  pressed && styles.cardPressed,
-                ]}
+                style={({ pressed }) => [styles.productCard, pressed && styles.cardPressed]}
               >
                 <ImageBackground
-                  source={{ uri: item.image }}
+                  source={{ uri: item.imageUrl }}
                   style={styles.cardBackground}
                   imageStyle={styles.cardImageStyle}
                 >
@@ -94,7 +109,7 @@ const GuestCollections = () => {
                   <View style={styles.cardHeader}>
                     <Pressable
                       style={styles.favoriteButton}
-                      onPress={() => toggleFavorite(item.id)}
+                      onPress={() => toggleFavorite(item.imageUrl)}
                       hitSlop={8}
                     >
                       <Ionicons
@@ -122,7 +137,6 @@ const GuestCollections = () => {
             );
           })}
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );

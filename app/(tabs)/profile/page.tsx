@@ -31,41 +31,23 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onPress,
   isDestructive = false,
 }) => (
-  <TouchableOpacity
-    style={styles.menuItem}
-    onPress={onPress}
-    activeOpacity={0.7}
-  >
+  <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
     <View style={styles.menuItemLeft}>
-      <View
-        style={[
-          styles.iconBadge,
-          isDestructive && styles.iconBadgeDestructive,
-        ]}
-      >
+      <View style={[styles.iconBadge, isDestructive && styles.iconBadgeDestructive]}>
         <Feather
           name={icon}
           size={18}
           color={isDestructive ? '#EF4444' : COLORS.primary || '#4830D3'}
         />
       </View>
-      <Text
-        style={[
-          styles.menuItemTitle,
-          isDestructive && styles.menuItemTitleDestructive,
-        ]}
-      >
+      <Text style={[styles.menuItemTitle, isDestructive && styles.menuItemTitleDestructive]}>
         {title}
       </Text>
     </View>
 
     <View style={styles.menuItemRight}>
       {value && <Text style={styles.menuItemValue}>{value}</Text>}
-      <FontAwesome
-        name="angle-right"
-        size={18}
-        color="#9CA3AF"
-      />
+      <FontAwesome name="angle-right" size={18} color="#9CA3AF" />
     </View>
   </TouchableOpacity>
 );
@@ -86,13 +68,10 @@ const Profile = () => {
       },
     ]);
   };
-
+  console.log(user);
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Header Title */}
         {/* <View style={styles.screenHeader}>
           <Text style={styles.screenTitle}>Profile</Text>
@@ -101,18 +80,17 @@ const Profile = () => {
         {/* User Profile Card */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarWrapper}>
-            {user?.avatar ?
-              <Image
-                style={styles.avatarImage}
-                resizeMode="cover"
-                source={{ uri: user.avatar }}
-              /> : <MaterialIcons name="verified-user" size={72} />}
+            {user?.avatar ? (
+              <Image style={styles.avatarImage} resizeMode="cover" source={{ uri: user.avatar }} />
+            ) : (
+              <MaterialIcons name="verified-user" size={72} />
+            )}
             <Pressable style={styles.editAvatarBtn} hitSlop={6}>
               <Ionicons name="camera" size={16} color="#FFFFFF" />
             </Pressable>
           </View>
 
-          <Text style={styles.userName}>{user?.username || 'John Doe'}</Text>
+          <Text style={styles.userName}>{user?.name}</Text>
           <View style={styles.emailContainer}>
             <Feather name="mail" size={14} color="#6B7280" />
             <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
@@ -126,7 +104,7 @@ const Profile = () => {
             <MenuItem
               icon="user"
               title="Full Name"
-              value={user?.username || 'John Doe'}
+              value={user?.name}
               onPress={() => router.navigate('/(tabs)/profile/edit-name' as any)}
             />
             <View style={styles.divider} />
@@ -183,11 +161,7 @@ const Profile = () => {
         </View>
 
         {/* Sign Out Button */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.8}>
           <MaterialIcons name="logout" size={20} color="#EF4444" />
           <Text style={styles.logoutButtonText}>Sign Out</Text>
         </TouchableOpacity>

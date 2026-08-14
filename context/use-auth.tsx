@@ -1,10 +1,10 @@
 import { API_BASE_URL } from '@/constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, View } from 'react-native';
 
 interface User {
-  username: string;
+  name: string;
   email: string;
   password?: string; // Optional, not stored in state
   avatar: string;
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await AsyncStorage.removeItem('authToken');
       setUser(null);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to log out');
     }
   }
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let isMounted = true;
 
     async function initializeAuth() {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token = AsyncStorage.getItem('token');
 
       if (!token) {
         if (isMounted) setIsLoading(false);
@@ -73,7 +73,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isMounted = false;
     };
   }, []);
-  return <AuthContext.Provider value={{ user, setUser, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, setUser, logout }}>
+      {isLoading ? (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}></View>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
