@@ -1,6 +1,6 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useState } from "react";
+import { Feather, Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -10,10 +10,10 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 
-import COLORS from "@/constants/color";
-import { SafeAreaView } from "react-native-safe-area-context";
+import COLORS from '@/constants/color';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Address {
   id: string;
@@ -32,44 +32,44 @@ interface PaymentMethod {
 
 const ADDRESSES: Address[] = [
   {
-    id: "1",
-    label: "Home",
-    street: "123 Innovation Way, Suite 400",
-    cityStateZip: "San Francisco, CA 94107",
+    id: '1',
+    label: 'Home',
+    street: '123 Innovation Way, Suite 400',
+    cityStateZip: 'San Francisco, CA 94107',
     isDefault: true,
   },
   {
-    id: "2",
-    label: "Office",
-    street: "500 Market Street, Floor 12",
-    cityStateZip: "San Francisco, CA 94105",
+    id: '2',
+    label: 'Office',
+    street: '500 Market Street, Floor 12',
+    cityStateZip: 'San Francisco, CA 94105',
   },
 ];
 
 const PAYMENT_METHODS: PaymentMethod[] = [
   {
-    id: "card",
-    title: "Credit / Debit Card",
-    subtitle: "•••• •••• •••• 4242",
-    icon: "card-outline",
+    id: 'card',
+    title: 'Credit / Debit Card',
+    subtitle: '•••• •••• •••• 4242',
+    icon: 'card-outline',
   },
   {
-    id: "apple_pay",
-    title: "Apple Pay",
-    subtitle: "Fast and secure checkout",
-    icon: "logo-apple",
+    id: 'apple_pay',
+    title: 'Apple Pay',
+    subtitle: 'Fast and secure checkout',
+    icon: 'logo-apple',
   },
   {
-    id: "cod",
-    title: "Cash on Delivery",
-    subtitle: "Pay when your package arrives",
-    icon: "cash-outline",
+    id: 'cod',
+    title: 'Cash on Delivery',
+    subtitle: 'Pay when your package arrives',
+    icon: 'cash-outline',
   },
 ];
 
 export default function CheckoutPage() {
-  const [selectedAddress, setSelectedAddress] = useState<string>("1");
-  const [selectedPayment, setSelectedPayment] = useState<string>("card");
+  const [selectedAddress, setSelectedAddress] = useState<string>('1');
+  const [selectedPayment, setSelectedPayment] = useState<string>('card');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Financial Breakdown Values
@@ -86,17 +86,21 @@ export default function CheckoutPage() {
       await new Promise((resolve) => setTimeout(resolve, 1800));
 
       Alert.alert(
-        "Order Confirmed! 🎉",
-        "Your payment was processed successfully. You can track your package in the Orders tab.",
+        'Order Confirmed! 🎉',
+        'Your payment was processed successfully. You can track your package in the Orders tab.',
         [
           {
-            text: "View Orders",
-            onPress: () => router.replace("/(tabs)/orders/page" as any),
+            text: 'View Orders',
+            onPress: () => router.replace('/(tabs)/orders/page' as any),
           },
         ]
       );
     } catch (error) {
-      Alert.alert("Payment Failed", "Something went wrong while placing your order. Please try again.");
+      console.log(error);
+      Alert.alert(
+        'Payment Failed',
+        'Something went wrong while placing your order. Please try again.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -136,7 +140,7 @@ export default function CheckoutPage() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Shipping Address</Text>
-            <TouchableOpacity onPress={() => Alert.alert("Add Address", "Open add address modal")}>
+            <TouchableOpacity onPress={() => Alert.alert('Add Address', 'Open add address modal')}>
               <Text style={styles.addNewText}>+ Add New</Text>
             </TouchableOpacity>
           </View>
@@ -151,9 +155,9 @@ export default function CheckoutPage() {
               >
                 <View style={styles.cardLeft}>
                   <Ionicons
-                    name={isSelected ? "radio-button-on" : "radio-button-off"}
+                    name={isSelected ? 'radio-button-on' : 'radio-button-off'}
                     size={20}
-                    color={isSelected ? COLORS.primary || "#4830D3" : "#9CA3AF"}
+                    color={isSelected ? COLORS.primary || '#4830D3' : '#9CA3AF'}
                   />
                   <View style={styles.cardInfo}>
                     <View style={styles.labelRow}>
@@ -183,9 +187,9 @@ export default function CheckoutPage() {
               >
                 <View style={styles.cardLeft}>
                   <Ionicons
-                    name={isSelected ? "radio-button-on" : "radio-button-off"}
+                    name={isSelected ? 'radio-button-on' : 'radio-button-off'}
                     size={20}
-                    color={isSelected ? COLORS.primary || "#4830D3" : "#9CA3AF"}
+                    color={isSelected ? COLORS.primary || '#4830D3' : '#9CA3AF'}
                   />
                   <View style={styles.paymentIconBadge}>
                     <Ionicons name={item.icon} size={20} color="#374151" />
@@ -259,25 +263,25 @@ export default function CheckoutPage() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background || "#F9FAFB",
+    backgroundColor: COLORS.background || '#F9FAFB',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
+    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
   },
   backBtn: {
     padding: 4,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -285,93 +289,93 @@ const styles = StyleSheet.create({
     paddingBottom: 110,
   },
   stepContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 24,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: '#E5E7EB',
   },
   stepBadge: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#E5E7EB",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   stepActive: {
-    backgroundColor: COLORS.primary || "#4830D3",
+    backgroundColor: COLORS.primary || '#4830D3',
   },
   stepNumber: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontWeight: '600',
+    color: '#6B7280',
   },
   stepNumberActive: {
     fontSize: 12,
-    fontWeight: "600",
-    color: "#FFFFFF",
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   stepLabel: {
     fontSize: 12,
-    color: "#6B7280",
+    color: '#6B7280',
     marginLeft: 6,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   stepLabelActive: {
     fontSize: 12,
-    color: "#111827",
+    color: '#111827',
     marginLeft: 6,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   stepLine: {
     width: 20,
     height: 1,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: '#E5E7EB',
     marginHorizontal: 8,
   },
   section: {
     marginBottom: 24,
   },
   sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
     marginBottom: 10,
   },
   addNewText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.primary || "#4830D3",
+    fontWeight: '600',
+    color: COLORS.primary || '#4830D3',
   },
   selectableCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1.5,
-    borderColor: "#E5E7EB",
+    borderColor: '#E5E7EB',
   },
   cardSelected: {
-    borderColor: COLORS.primary || "#4830D3",
-    backgroundColor: "rgba(72, 48, 211, 0.02)",
+    borderColor: COLORS.primary || '#4830D3',
+    backgroundColor: 'rgba(72, 48, 211, 0.02)',
   },
   cardLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     gap: 12,
   },
@@ -379,95 +383,95 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: "#F3F4F6",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cardInfo: {
     flex: 1,
   },
   labelRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: "600",
-    color: "#1F2937",
+    fontWeight: '600',
+    color: '#1F2937',
   },
   defaultBadge: {
     fontSize: 10,
-    fontWeight: "700",
-    color: COLORS.primary || "#4830D3",
-    backgroundColor: "rgba(72, 48, 211, 0.1)",
+    fontWeight: '700',
+    color: COLORS.primary || '#4830D3',
+    backgroundColor: 'rgba(72, 48, 211, 0.1)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
   cardSub: {
     fontSize: 13,
-    color: "#6B7280",
+    color: '#6B7280',
     marginTop: 2,
   },
   summaryCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: '#E5E7EB',
     gap: 12,
   },
   summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   summaryLabel: {
     fontSize: 14,
-    color: "#6B7280",
+    color: '#6B7280',
   },
   summaryValue: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#111827",
+    fontWeight: '600',
+    color: '#111827',
   },
   discountValue: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#10B981",
+    fontWeight: '600',
+    color: '#10B981',
   },
   divider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: '#F3F4F6',
     marginVertical: 2,
   },
   totalLabel: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
   },
   totalValue: {
     fontSize: 18,
-    fontWeight: "800",
-    color: COLORS.primary || "#4830D3",
+    fontWeight: '800',
+    color: COLORS.primary || '#4830D3',
   },
   footerBar: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 24,
     borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
+    borderTopColor: '#E5E7EB',
     elevation: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
@@ -477,23 +481,23 @@ const styles = StyleSheet.create({
   },
   footerLabel: {
     fontSize: 12,
-    color: "#6B7280",
-    fontWeight: "500",
+    color: '#6B7280',
+    fontWeight: '500',
   },
   footerTotal: {
     fontSize: 20,
-    fontWeight: "800",
-    color: "#111827",
+    fontWeight: '800',
+    color: '#111827',
   },
   placeOrderBtn: {
-    backgroundColor: COLORS.primary || "#4830D3",
-    flexDirection: "row",
-    alignItems: "center",
+    backgroundColor: COLORS.primary || '#4830D3',
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     paddingHorizontal: 24,
     height: 48,
     borderRadius: 12,
-    shadowColor: COLORS.primary || "#4830D3",
+    shadowColor: COLORS.primary || '#4830D3',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -503,8 +507,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   placeOrderText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 });

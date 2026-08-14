@@ -1,0 +1,3 @@
+# Open and edit .husky/pre-commit
+
+npx lint-staged

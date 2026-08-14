@@ -1,20 +1,13 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useState } from "react";
-import {
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
+import { Feather, Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import COLORS from "@/constants/color";
-import { SafeAreaView } from "react-native-safe-area-context";
+import COLORS from '@/constants/color';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-type NotificationType = "order" | "promo" | "account" | "system";
-type FilterTab = "all" | "unread" | "orders" | "promos";
+type NotificationType = 'order' | 'promo' | 'account' | 'system';
+type FilterTab = 'all' | 'unread' | 'orders' | 'promos';
 
 interface NotificationItem {
   id: string;
@@ -28,53 +21,53 @@ interface NotificationItem {
 
 const MOCK_NOTIFICATIONS: NotificationItem[] = [
   {
-    id: "notif_1",
-    type: "order",
-    title: "Order #ORD-98231 Shipped! 🚚",
-    message: "Your package is on its way and scheduled to arrive by Friday, Aug 7.",
-    timestamp: "2m ago",
+    id: 'notif_1',
+    type: 'order',
+    title: 'Order #ORD-98231 Shipped! 🚚',
+    message: 'Your package is on its way and scheduled to arrive by Friday, Aug 7.',
+    timestamp: '2m ago',
     isRead: false,
-    targetRoute: "/(tabs)/orders/track/ord_101",
+    targetRoute: '/(tabs)/orders/track/ord_101',
   },
   {
-    id: "notif_2",
-    type: "promo",
-    title: "Flash Sale Alert! ⚡ 20% OFF",
-    message: "Use promo code FLASH20 at checkout for 20% off all minimalist footwear.",
-    timestamp: "1h ago",
+    id: 'notif_2',
+    type: 'promo',
+    title: 'Flash Sale Alert! ⚡ 20% OFF',
+    message: 'Use promo code FLASH20 at checkout for 20% off all minimalist footwear.',
+    timestamp: '1h ago',
     isRead: false,
-    targetRoute: "/(tabs)/home",
+    targetRoute: '/(tabs)/home',
   },
   {
-    id: "notif_3",
-    type: "order",
-    title: "Payment Successful",
+    id: 'notif_3',
+    type: 'order',
+    title: 'Payment Successful',
     message: "Thank you for your purchase! We've received your payment of $315.00.",
-    timestamp: "3h ago",
+    timestamp: '3h ago',
     isRead: true,
-    targetRoute: "/(tabs)/orders/detail/ord_101",
+    targetRoute: '/(tabs)/orders/detail/ord_101',
   },
   {
-    id: "notif_4",
-    type: "account",
-    title: "Security Alert 🛡️",
-    message: "Your account password was successfully updated.",
-    timestamp: "1d ago",
+    id: 'notif_4',
+    type: 'account',
+    title: 'Security Alert 🛡️',
+    message: 'Your account password was successfully updated.',
+    timestamp: '1d ago',
     isRead: true,
   },
   {
-    id: "notif_5",
-    type: "system",
-    title: "Welcome to FC-Commerce!",
-    message: "Explore our curated collections and enjoy 10% off your first order.",
-    timestamp: "3d ago",
+    id: 'notif_5',
+    type: 'system',
+    title: 'Welcome to FC-Commerce!',
+    message: 'Explore our curated collections and enjoy 10% off your first order.',
+    timestamp: '3d ago',
     isRead: true,
   },
 ];
 
 export default function NotificationScreen() {
   const [notifications, setNotifications] = useState<NotificationItem[]>(MOCK_NOTIFICATIONS);
-  const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   // Mark all notifications as read
   const handleMarkAllAsRead = () => {
@@ -83,9 +76,7 @@ export default function NotificationScreen() {
 
   // Toggle single item read status on tap
   const handleItemPress = (item: NotificationItem) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === item.id ? { ...n, isRead: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === item.id ? { ...n, isRead: true } : n)));
 
     if (item.targetRoute) {
       router.navigate(item.targetRoute as any);
@@ -99,9 +90,9 @@ export default function NotificationScreen() {
 
   // Filter logic
   const filteredNotifications = notifications.filter((item) => {
-    if (activeTab === "unread") return !item.isRead;
-    if (activeTab === "orders") return item.type === "order";
-    if (activeTab === "promos") return item.type === "promo";
+    if (activeTab === 'unread') return !item.isRead;
+    if (activeTab === 'orders') return item.type === 'order';
+    if (activeTab === 'promos') return item.type === 'promo';
     return true;
   });
 
@@ -109,29 +100,29 @@ export default function NotificationScreen() {
 
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
-      case "order":
+      case 'order':
         return {
-          icon: "cube-outline" as const,
-          bgColor: "#E0F2FE",
-          iconColor: "#0284C7",
+          icon: 'cube-outline' as const,
+          bgColor: '#E0F2FE',
+          iconColor: '#0284C7',
         };
-      case "promo":
+      case 'promo':
         return {
-          icon: "pricetag-outline" as const,
-          bgColor: "#FEF3C7",
-          iconColor: "#D97706",
+          icon: 'pricetag-outline' as const,
+          bgColor: '#FEF3C7',
+          iconColor: '#D97706',
         };
-      case "account":
+      case 'account':
         return {
-          icon: "shield-checkmark-outline" as const,
-          bgColor: "#D1FAE5",
-          iconColor: "#059669",
+          icon: 'shield-checkmark-outline' as const,
+          bgColor: '#D1FAE5',
+          iconColor: '#059669',
         };
       default:
         return {
-          icon: "notifications-outline" as const,
-          bgColor: "rgba(72, 48, 211, 0.1)",
-          iconColor: COLORS.primary || "#4830D3",
+          icon: 'notifications-outline' as const,
+          bgColor: 'rgba(72, 48, 211, 0.1)',
+          iconColor: COLORS.primary || '#4830D3',
         };
     }
   };
@@ -156,7 +147,7 @@ export default function NotificationScreen() {
 
       {/* Segmented Filter Pills */}
       <View style={styles.filterContainer}>
-        {(["all", "unread", "orders", "promos"] as FilterTab[]).map((tab) => {
+        {(['all', 'unread', 'orders', 'promos'] as FilterTab[]).map((tab) => {
           const isSelected = activeTab === tab;
           return (
             <Pressable
@@ -176,11 +167,15 @@ export default function NotificationScreen() {
       {filteredNotifications.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconBadge}>
-            <Ionicons name="notifications-off-outline" size={44} color={COLORS.primary || "#4830D3"} />
+            <Ionicons
+              name="notifications-off-outline"
+              size={44}
+              color={COLORS.primary || '#4830D3'}
+            />
           </View>
           <Text style={styles.emptyTitle}>No notifications</Text>
           <Text style={styles.emptySubtitle}>
-            You're all caught up! Check back later for order updates and promo deals.
+            You`&apos;`re all caught up! Check back later for order updates and promo deals.
           </Text>
         </View>
       ) : (
@@ -193,10 +188,7 @@ export default function NotificationScreen() {
             const config = getNotificationIcon(item.type);
             return (
               <TouchableOpacity
-                style={[
-                  styles.notificationCard,
-                  !item.isRead && styles.unreadCard,
-                ]}
+                style={[styles.notificationCard, !item.isRead && styles.unreadCard]}
                 onPress={() => handleItemPress(item)}
                 activeOpacity={0.8}
               >
@@ -209,10 +201,7 @@ export default function NotificationScreen() {
                 <View style={styles.cardContent}>
                   <View style={styles.titleRow}>
                     <Text
-                      style={[
-                        styles.notifTitle,
-                        !item.isRead && styles.unreadTitleText,
-                      ]}
+                      style={[styles.notifTitle, !item.isRead && styles.unreadTitleText]}
                       numberOfLines={1}
                     >
                       {item.title}
@@ -248,33 +237,33 @@ export default function NotificationScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: COLORS.background || "#F9FAFB",
+    backgroundColor: COLORS.background || '#F9FAFB',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: '#E5E7EB',
   },
   backBtn: {
     padding: 4,
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
   },
   markReadText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: COLORS.primary || "#4830D3",
+    fontWeight: '600',
+    color: COLORS.primary || '#4830D3',
   },
   filterContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 14,
     gap: 8,
@@ -283,51 +272,51 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 7,
     borderRadius: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: '#E5E7EB',
   },
   chipActive: {
-    backgroundColor: "#111827",
-    borderColor: "#111827",
+    backgroundColor: '#111827',
+    borderColor: '#111827',
   },
   chipText: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#4B5563",
+    fontWeight: '600',
+    color: '#4B5563',
   },
   chipTextActive: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 24,
   },
   notificationCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    backgroundColor: "#FFFFFF",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
     shadowRadius: 2,
     elevation: 1,
   },
   unreadCard: {
-    backgroundColor: "rgba(72, 48, 211, 0.02)",
-    borderColor: "rgba(72, 48, 211, 0.2)",
+    backgroundColor: 'rgba(72, 48, 211, 0.02)',
+    borderColor: 'rgba(72, 48, 211, 0.2)',
   },
   iconBadge: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
   },
   cardContent: {
@@ -335,50 +324,50 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 4,
   },
   notifTitle: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+    fontWeight: '600',
+    color: '#374151',
     flex: 1,
     marginRight: 8,
   },
   unreadTitleText: {
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
   },
   timeText: {
     fontSize: 12,
-    color: "#9CA3AF",
+    color: '#9CA3AF',
   },
   notifMessage: {
     fontSize: 13,
-    color: "#6B7280",
+    color: '#6B7280',
     lineHeight: 18,
   },
   cardRight: {
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    height: "100%",
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    height: '100%',
     gap: 12,
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary || "#4830D3",
+    backgroundColor: COLORS.primary || '#4830D3',
   },
   deleteBtn: {
     padding: 2,
   },
   emptyContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 32,
     marginTop: 60,
   },
@@ -386,21 +375,21 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 28,
-    backgroundColor: "rgba(72, 48, 211, 0.08)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: 'rgba(72, 48, 211, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#111827",
+    fontWeight: '700',
+    color: '#111827',
     marginBottom: 6,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: "#6B7280",
-    textAlign: "center",
+    color: '#6B7280',
+    textAlign: 'center',
     lineHeight: 20,
   },
 });

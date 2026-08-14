@@ -1,0 +1,9 @@
+node_modules
+.next
+.expo
+dist
+build
+*.db
+*.sqlite
+package-lock.json
+bun.lockb
