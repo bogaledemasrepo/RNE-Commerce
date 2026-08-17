@@ -1,6 +1,6 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -109,7 +109,7 @@ export default function CheckoutPage() {
           [
             {
               text: 'View Orders',
-              onPress: () => router.replace('/(tabs)/orders/page' as any),
+              onPress: () => router.navigate('/(tabs)/orders/page' as any),
             },
           ]
         );
@@ -124,7 +124,9 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
-
+  useEffect(() => {
+    if (items.length == 0) router.replace('/(tabs)/orders/page');
+  }, []);
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Header Bar */}

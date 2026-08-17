@@ -23,3 +23,23 @@ export interface PaginatedProductResponse {
   totalPages: number;
   last: boolean;
 }
+
+export type OrderStatus = 'all' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type TabType = 'all' | 'active' | 'completed' | 'cancelled';
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  date: string;
+  status: OrderStatus;
+  items: OrderItem[];
+  totalAmount: number;
+}

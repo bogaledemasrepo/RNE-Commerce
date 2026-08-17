@@ -15,11 +15,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PaginatedProductResponse } from '@/app/types';
 import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
+import { PaginatedProductResponse } from '@/types';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 44) / 2; // Precise 2-column calculation
