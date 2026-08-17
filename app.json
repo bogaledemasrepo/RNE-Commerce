@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.bogitech.RNECommerce"
+      "package": "com.bogitech.RNECommerce",
+      "versionCode": 2
     },
     "web": {
       "output": "static",

@@ -1,8 +1,9 @@
-import { Product } from '@/app/types';
+import { Product } from '@/types';
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 // 1. Extend Product to track quantity in cart
 export interface CartItem extends Product {
+  // productId: number;
   quantity: number;
 }
 

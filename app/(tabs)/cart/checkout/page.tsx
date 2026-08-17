@@ -12,7 +12,10 @@ import {
   View,
 } from 'react-native';
 
+import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
+import { useCart } from '@/context/use-cart';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Address {
@@ -71,6 +74,7 @@ export default function CheckoutPage() {
   const [selectedAddress, setSelectedAddress] = useState<string>('1');
   const [selectedPayment, setSelectedPayment] = useState<string>('card');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { items, clearCart } = useCart();
 
   // Financial Breakdown Values
   const subtotal = 420.0;
@@ -79,22 +83,37 @@ export default function CheckoutPage() {
   const grandTotal = subtotal + shipping - discount;
 
   const handlePlaceOrder = async () => {
+    const token = (await AsyncStorage.getItem('token')) || '';
     setIsSubmitting(true);
 
     try {
-      // Simulate API call for payment processing & order creation
-      await new Promise((resolve) => setTimeout(resolve, 1800));
-
-      Alert.alert(
-        'Order Confirmed! 🎉',
-        'Your payment was processed successfully. You can track your package in the Orders tab.',
-        [
-          {
-            text: 'View Orders',
-            onPress: () => router.replace('/(tabs)/orders/page' as any),
-          },
-        ]
-      );
+      const response = await fetch(API_BASE_URL + '/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      console.log(response);
+      if (response.ok) {
+        clearCart();
+        Alert.alert(
+          'Order Confirmed! 🎉',
+          'Your payment was processed successfully. You can track your package in the Orders tab.',
+          [
+            {
+              text: 'View Orders',
+              onPress: () => router.replace('/(tabs)/orders/page' as any),
+            },
+          ]
+        );
+      } else throw Error('Something went wrong!');
     } catch (error) {
       console.log(error);
       Alert.alert(

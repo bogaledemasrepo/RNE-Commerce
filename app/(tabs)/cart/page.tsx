@@ -17,36 +17,6 @@ import COLORS from '@/constants/color';
 import { useCart } from '@/context/use-cart';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface CartItem {
-  id: string;
-  name: string;
-  variant: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-const MOCK_CART: CartItem[] = [
-  {
-    id: '1',
-    name: 'Minimalist Leather Sneaker',
-    variant: 'White / Size 42',
-    price: 180.0,
-    quantity: 1,
-    image:
-      'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=500&auto=format&fit=crop',
-  },
-  {
-    id: '2',
-    name: 'Classic Heritage Hoodie',
-    variant: 'Black / Size L',
-    price: 120.0,
-    quantity: 2,
-    image:
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=500&auto=format&fit=crop',
-  },
-];
-
 export default function CartPage() {
   const {
     items,
@@ -108,7 +78,7 @@ export default function CartPage() {
           </View>
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
           <Text style={styles.emptySubtitle}>
-            Looks like you haven`&apos;`t added anything to your cart yet.
+            Looks like you haven&apos;t added anything to your cart yet.
           </Text>
           <TouchableOpacity
             style={styles.exploreBtn}
