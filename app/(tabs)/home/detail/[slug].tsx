@@ -59,6 +59,7 @@ export default function DetailScreen() {
     if (item) {
       addItem(item);
       Toast.success('Added to cart!');
+      router.back();
     } else Toast.error('Something goes wrong!');
   };
 

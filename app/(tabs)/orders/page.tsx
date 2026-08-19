@@ -208,14 +208,14 @@ export default function OrderScreen() {
                       </TouchableOpacity>
                     )}
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       style={styles.detailsBtn}
                       onPress={() => router.navigate(`/(tabs)/orders/detail/${item.id}` as any)}
                       activeOpacity={0.8}
                     >
                       <Text style={styles.detailsBtnText}>Details</Text>
                       <Feather name="chevron-right" size={16} color="#4B5563" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
               </View>

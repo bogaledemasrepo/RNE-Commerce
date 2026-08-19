@@ -30,7 +30,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onPress,
   isDestructive = false,
 }) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
+  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <View style={styles.menuItemLeft}>
       <View style={[styles.iconBadge, isDestructive && styles.iconBadgeDestructive]}>
         <Feather
@@ -100,18 +100,13 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Personal Details</Text>
           <View style={styles.cardGroup}>
-            <MenuItem
-              icon="user"
-              title="Full Name"
-              value={user?.name}
-              onPress={() => router.navigate('/(tabs)/profile/edit-name' as any)}
-            />
+            <MenuItem icon="user" title="Full Name" value={user?.name} onPress={() => {}} />
             <View style={styles.divider} />
             <MenuItem
               icon="mail"
-              title="Email Address"
+              title="Email"
               value={user?.email || 'user@example.com'}
-              onPress={() => router.navigate('/(tabs)/profile/edit-email' as any)}
+              onPress={() => {}}
             />
           </View>
         </View>
@@ -120,18 +115,9 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Account & Security</Text>
           <View style={styles.cardGroup}>
-            <MenuItem
-              icon="lock"
-              title="Change Password"
-              onPress={() => router.navigate('/(tabs)/profile/change-password' as any)}
-            />
+            <MenuItem icon="lock" title="Change Password" onPress={() => {}} />
             <View style={styles.divider} />
-            <MenuItem
-              icon="shield"
-              title="Two-Factor Auth"
-              value="Disabled"
-              onPress={() => router.navigate('/(tabs)/profile/2fa' as any)}
-            />
+            <MenuItem icon="shield" title="Two-Factor Auth" value="Disabled" onPress={() => {}} />
           </View>
         </View>
 
@@ -139,23 +125,11 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Support & Info</Text>
           <View style={styles.cardGroup}>
-            <MenuItem
-              icon="help-circle"
-              title="Frequently Asked Questions"
-              onPress={() => router.navigate('/(tabs)/profile/faq' as any)}
-            />
+            <MenuItem icon="help-circle" title="Frequently Asked Questions" onPress={() => {}} />
             <View style={styles.divider} />
-            <MenuItem
-              icon="message-square"
-              title="Submit Feedback"
-              onPress={() => router.navigate('/(tabs)/profile/feedback' as any)}
-            />
+            <MenuItem icon="message-square" title="Submit Feedback" onPress={() => {}} />
             <View style={styles.divider} />
-            <MenuItem
-              icon="info"
-              title="About Us"
-              onPress={() => router.navigate('/(tabs)/profile/about' as any)}
-            />
+            <MenuItem icon="info" title="About Us" onPress={() => {}} />
           </View>
         </View>
 
