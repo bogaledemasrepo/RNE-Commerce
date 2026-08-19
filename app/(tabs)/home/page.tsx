@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Dimensions,
+  Image,
   ImageBackground,
   Pressable,
   ScrollView,
@@ -119,10 +120,12 @@ const Home = () => {
                 <View
                   style={[styles.categoryIconCircle, isSelected && styles.categoryIconCircleActive]}
                 >
-                  <Ionicons
-                    name={'accessibility'}
-                    size={22}
-                    color={isSelected ? '#FFFFFF' : '#374151'}
+                  <Image
+                    source={{ uri: item.thumbnail }}
+                    width={40}
+                    height={40}
+                    resizeMethod="resize"
+                    resizeMode="contain"
                   />
                 </View>
                 <Text style={[styles.categoryLabel, isSelected && styles.categoryLabelActive]}>
