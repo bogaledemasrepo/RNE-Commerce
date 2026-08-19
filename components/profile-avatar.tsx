@@ -1,4 +1,7 @@
+import { API_BASE_URL } from '@/constants';
+import { useAuth } from '@/context/use-auth';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -19,8 +22,68 @@ export function ProfileAvatar({
   size = 100,
 }: ProfileAvatarProps) {
   const [loading, setLoading] = useState(false);
+  const { setUser } = useAuth();
 
-  // Extract initials for fallback avatar (e.g., "John Doe" -> "JD")
+  const handleUpdateAvatar = async (asset: ImagePicker.ImagePickerAsset) => {
+    setLoading(true);
+    try {
+      const rawToken = await AsyncStorage.getItem('token');
+
+      if (!rawToken) {
+        Alert.alert('Authentication Error', 'Session expired. Please log in again.');
+        return;
+      }
+
+      // Ensure authorization header is strictly formatted
+      const token = rawToken.replace(/^Bearer\s+/i, '');
+
+      // Resolve URI and fallback file properties safely
+      const fileUri = asset.uri;
+      const fileName = asset.fileName || fileUri.split('/').pop() || 'avatar.jpg';
+
+      // Fallback MIME type detection based on extension if mimeType is undefined
+      const extension = fileName.split('.').pop()?.toLowerCase();
+      const mimeType = asset.mimeType || (extension === 'png' ? 'image/png' : 'image/jpeg');
+
+      // Create React Native multipart object strictly matching native expectation
+      const formData = new FormData();
+      formData.append('avatar', {
+        uri: fileUri,
+        name: fileName,
+        type: mimeType,
+      } as any);
+
+      const response = await fetch(API_BASE_URL + '/users/me', {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json',
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser(updatedUser);
+
+        if (onAvatarChange) {
+          await onAvatarChange(fileUri);
+        }
+
+        Alert.alert('Success', 'Profile photo updated!');
+      } else {
+        const errorText = await response.text();
+        console.error(`HTTP ${response.status} Server Error:`, errorText);
+        Alert.alert('Upload Failed', `Server responded with status code ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Avatar update error:', error);
+      Alert.alert('Error', 'Failed to upload photo. Please check your network connection.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
@@ -29,10 +92,8 @@ export function ProfileAvatar({
     return parts[0] ? parts[0][0].toUpperCase() : 'U';
   };
 
-  // Image Picker Logic with Permission Request
   const handlePickImage = async () => {
     try {
-      // 1. Request Media Library Permissions
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(
@@ -42,33 +103,25 @@ export function ProfileAvatar({
         return;
       }
 
-      // 2. Open Native Image Picker
+      // 3. Updated Expo ImagePicker API to fix deprecation warning
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
-        aspect: [1, 1], // Square crop
+        aspect: [1, 1],
         quality: 0.8,
       });
 
-      if (!result.canceled && result.assets[0]?.uri) {
-        const selectedUri = result.assets[0].uri;
-
-        // 3. Trigger Async Upload Callback
-        if (onAvatarChange) {
-          setLoading(true);
-          await onAvatarChange(selectedUri);
-        }
+      if (!result.canceled && result.assets[0]) {
+        await handleUpdateAvatar(result.assets[0]);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile image. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to select image.');
     }
   };
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      {/* --- Main Avatar Frame --- */}
       <View style={[styles.avatarRing, { borderRadius: size / 2 }]}>
         {avatarUrl ? (
           <Image
@@ -84,7 +137,6 @@ export function ProfileAvatar({
           </View>
         )}
 
-        {/* Upload Loading Overlay */}
         {loading && (
           <View style={[styles.loadingOverlay, { borderRadius: size / 2 }]}>
             <ActivityIndicator size="small" color="#FFFFFF" />
@@ -92,7 +144,6 @@ export function ProfileAvatar({
         )}
       </View>
 
-      {/* --- Edit Action Button --- */}
       <Pressable
         style={styles.editAvatarBtn}
         onPress={handlePickImage}
@@ -103,7 +154,6 @@ export function ProfileAvatar({
         <Ionicons name="camera" size={16} color="#FFFFFF" />
       </Pressable>
 
-      {/* --- Verified Badge Indicator --- */}
       {isVerified && (
         <View style={styles.verifiedBadge}>
           <MaterialIcons name="verified-user" size={12} color="#FFFFFF" />
@@ -181,7 +231,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    backgroundColor: '#10B981', // Emerald Verified Green
+    backgroundColor: '#10B981',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,

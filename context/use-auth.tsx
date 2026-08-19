@@ -1,5 +1,5 @@
-import { User } from '@/app/types';
 import { API_BASE_URL } from '@/constants';
+import { User } from '@/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';

@@ -10,43 +10,11 @@ import MenuItem from '@/components/menu-item';
 import { ProfileAvatar } from '@/components/profile-avatar';
 import { SFeedback } from '@/components/sfeedback';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
-import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState } from 'react';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
-  const [avatarUri, setAvatarUri] = useState(user?.avatar);
-
-  const handleUpdateAvatar = async (newUri: string) => {
-    const token = AsyncStorage.getItem('token');
-    try {
-      // 1. Optional: Call your Spring Boot/API backend endpoint here
-      const formData = new FormData();
-      formData.append('avatar', {
-        uri: newUri,
-        name: 'avatar.jpg',
-        type: 'image/jpeg',
-      } as unknown as Blob);
-      const response = await fetch(API_BASE_URL + '/users/me', {
-        method: 'PUT',
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-        body: formData,
-      });
-      if (response.ok) {
-        const { avatar } = await response.json();
-        setAvatarUri(newUri);
-        Alert.alert('Success', 'Profile photo updated!');
-      }
-      throw new Error('Feild to update profile photo!');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to upload photo.');
-    }
-  };
+  const { user, setUser, logout } = useAuth();
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out of your account?', [
@@ -67,21 +35,10 @@ const Profile = () => {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* User Profile Card */}
         <View style={styles.profileHeader}>
-          {/* <View style={styles.avatarWrapper}>
-            {user?.avatar ? (
-              <Image style={styles.avatarImage} resizeMode="cover" source={{ uri: user.avatar }} />
-            ) : (
-              <MaterialIcons name="verified-user" size={72} />
-            )}
-            <Pressable style={styles.editAvatarBtn} hitSlop={6}>
-              <Ionicons name="camera" size={16} color="#FFFFFF" />
-            </Pressable>
-          </View> */}
           <ProfileAvatar
-            avatarUrl={avatarUri}
+            avatarUrl={user?.avatar}
             userName={user?.name || 'Bogale'}
             isVerified={true}
-            onAvatarChange={handleUpdateAvatar}
             size={110}
           />
           <Text style={styles.userName}>{user?.name}</Text>
