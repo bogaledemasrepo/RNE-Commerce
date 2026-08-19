@@ -1,6 +1,5 @@
-import { Feather, FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
 import {
   Alert,
   Image,
@@ -12,44 +11,15 @@ import {
   View,
 } from 'react-native';
 
+import { Aboutus } from '@/components/acout-us';
+import { ChangePassword } from '@/components/change-password';
+import { EmailNameChange } from '@/components/email-name-update';
+import { FAQuestions } from '@/components/faquestions';
+import MenuItem from '@/components/menu-item';
+import { SFeedback } from '@/components/sfeedback';
+import { TwoFactorAuth } from '@/components/two-factor-auth';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
-
-interface MenuItemProps {
-  icon: keyof typeof Feather.glyphMap;
-  title: string;
-  value?: string;
-  onPress: () => void;
-  isDestructive?: boolean;
-}
-
-const MenuItem: React.FC<MenuItemProps> = ({
-  icon,
-  title,
-  value,
-  onPress,
-  isDestructive = false,
-}) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <View style={styles.menuItemLeft}>
-      <View style={[styles.iconBadge, isDestructive && styles.iconBadgeDestructive]}>
-        <Feather
-          name={icon}
-          size={18}
-          color={isDestructive ? '#EF4444' : COLORS.primary || '#4830D3'}
-        />
-      </View>
-      <Text style={[styles.menuItemTitle, isDestructive && styles.menuItemTitleDestructive]}>
-        {title}
-      </Text>
-    </View>
-
-    <View style={styles.menuItemRight}>
-      {value && <Text style={styles.menuItemValue}>{value}</Text>}
-      <FontAwesome name="angle-right" size={18} color="#9CA3AF" />
-    </View>
-  </TouchableOpacity>
-);
 
 const Profile = () => {
   const { user, logout } = useAuth();
@@ -67,15 +37,10 @@ const Profile = () => {
       },
     ]);
   };
-  console.log(user);
+
   return (
     <View style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header Title */}
-        {/* <View style={styles.screenHeader}>
-          <Text style={styles.screenTitle}>Profile</Text>
-        </View> */}
-
         {/* User Profile Card */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarWrapper}>
@@ -100,14 +65,13 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Personal Details</Text>
           <View style={styles.cardGroup}>
-            <MenuItem icon="user" title="Full Name" value={user?.name} onPress={() => {}} />
+            <EmailNameChange>
+              <MenuItem icon="user" title="Full Name" value={user?.name} />
+            </EmailNameChange>
             <View style={styles.divider} />
-            <MenuItem
-              icon="mail"
-              title="Email"
-              value={user?.email || 'user@example.com'}
-              onPress={() => {}}
-            />
+            <EmailNameChange>
+              <MenuItem icon="mail" title="Email" value={user?.email || 'user@example.com'} />
+            </EmailNameChange>
           </View>
         </View>
 
@@ -115,9 +79,9 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Account & Security</Text>
           <View style={styles.cardGroup}>
-            <MenuItem icon="lock" title="Change Password" onPress={() => {}} />
+            <ChangePassword />
             <View style={styles.divider} />
-            <MenuItem icon="shield" title="Two-Factor Auth" value="Disabled" onPress={() => {}} />
+            <TwoFactorAuth />
           </View>
         </View>
 
@@ -125,11 +89,18 @@ const Profile = () => {
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Support & Info</Text>
           <View style={styles.cardGroup}>
-            <MenuItem icon="help-circle" title="Frequently Asked Questions" onPress={() => {}} />
+            <FAQuestions>
+              <MenuItem icon="help-circle" title="Frequently Asked Questions" />
+            </FAQuestions>
+
             <View style={styles.divider} />
-            <MenuItem icon="message-square" title="Submit Feedback" onPress={() => {}} />
+            <SFeedback>
+              <MenuItem icon="message-square" title="Submit Feedback" />
+            </SFeedback>
             <View style={styles.divider} />
-            <MenuItem icon="info" title="About Us" onPress={() => {}} />
+            <Aboutus>
+              <MenuItem icon="info" title="About Us" />
+            </Aboutus>
           </View>
         </View>
 
@@ -154,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background || '#F9FAFB',
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     paddingTop: 12,
     paddingBottom: 60,
   },
@@ -239,46 +210,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 1,
   },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(72, 48, 211, 0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconBadgeDestructive: {
-    backgroundColor: '#FEF2F2',
-  },
-  menuItemTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1F2937',
-  },
-  menuItemTitleDestructive: {
-    color: '#EF4444',
-  },
-  menuItemRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  menuItemValue: {
-    fontSize: 14,
-    color: '#9CA3AF',
-  },
+
   divider: {
     height: 1,
     backgroundColor: '#F3F4F6',

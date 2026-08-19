@@ -88,7 +88,8 @@ export function DynamicModal({
 
           {/* Animated Modal Bottom Sheet */}
           <Animated.View
-            entering={SlideInDown.springify().damping(28).stiffness(300)}
+            entering={SlideInDown.damping(28).stiffness(300)}
+            //entering={SlideInDown.springify().damping(28).stiffness(300)}
             exiting={SlideOutDown.duration(200)}
             style={[styles.modalSheet, { maxHeight }]}
           >
