@@ -7,7 +7,6 @@ import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { Order, OrderStatus, TabType } from '@/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function OrderScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('active');
@@ -86,7 +85,7 @@ export default function OrderScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Orders</Text>
@@ -224,7 +223,7 @@ export default function OrderScreen() {
           }}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

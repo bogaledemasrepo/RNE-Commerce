@@ -15,7 +15,6 @@ import {
 
 import COLORS from '@/constants/color';
 import { useCart } from '@/context/use-cart';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CartPage() {
   const {
@@ -71,7 +70,7 @@ export default function CartPage() {
   // Empty Cart Component
   if (items.length === 0) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconBadge}>
             <Ionicons name="bag-handle-outline" size={48} color={COLORS.primary || '#4830D3'} />
@@ -88,12 +87,12 @@ export default function CartPage() {
             <Text style={styles.exploreBtnText}>Start Shopping</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {/* Page Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Shopping Cart</Text>
@@ -215,7 +214,7 @@ export default function CartPage() {
           <Feather name="arrow-right" size={18} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -18,7 +18,7 @@ export default function RootLayout() {
           </Stack>
         </CartProvider>
       </AuthProvider>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <ToastManager />
     </>
   );

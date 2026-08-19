@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import COLORS from '@/constants/color';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type NotificationType = 'order' | 'promo' | 'account' | 'system';
 type FilterTab = 'all' | 'unread' | 'orders' | 'promos';
@@ -128,7 +127,7 @@ export default function NotificationScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {/* Header Bar */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} hitSlop={8}>
@@ -230,7 +229,7 @@ export default function NotificationScreen() {
           }}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

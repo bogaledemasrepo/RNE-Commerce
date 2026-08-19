@@ -14,12 +14,11 @@ import {
 } from 'react-native';
 import ToastManager, { Toast } from 'toastify-react-native';
 
-import { Product } from '@/app/types';
 import { EcommerceLoader } from '@/components/EcommerceLoader';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useCart } from '@/context/use-cart';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Product } from '@/types';
 
 const { width } = Dimensions.get('window');
 
@@ -75,7 +74,7 @@ export default function DetailScreen() {
     fetchCategories();
   }, []);
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {item ? (
         <>
           <View style={styles.container}>
@@ -285,7 +284,7 @@ export default function DetailScreen() {
         <EcommerceLoader message="Fetching products..." />
       )}
       <ToastManager />
-    </SafeAreaView>
+    </View>
   );
 }
 

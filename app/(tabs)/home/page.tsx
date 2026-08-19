@@ -13,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
@@ -66,7 +65,7 @@ const Home = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Top Header Bar */}
         <View style={styles.headerRow}>
@@ -227,7 +226,7 @@ const Home = () => {
           })}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

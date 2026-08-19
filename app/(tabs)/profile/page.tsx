@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
@@ -70,7 +69,7 @@ const Profile = () => {
   };
   console.log(user);
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Header Title */}
         {/* <View style={styles.screenHeader}>
@@ -169,7 +168,7 @@ const Profile = () => {
         {/* App Version Info */}
         <Text style={styles.versionText}>App Version 1.0.0 (Build 104)</Text>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

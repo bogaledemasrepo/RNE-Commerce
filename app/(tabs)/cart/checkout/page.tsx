@@ -16,7 +16,6 @@ import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useCart } from '@/context/use-cart';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Address {
   id: string;
@@ -128,7 +127,7 @@ export default function CheckoutPage() {
     if (items.length == 0) router.replace('/(tabs)/orders/page');
   }, []);
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       {/* Header Bar */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} hitSlop={8}>
@@ -277,7 +276,7 @@ export default function CheckoutPage() {
           )}
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
