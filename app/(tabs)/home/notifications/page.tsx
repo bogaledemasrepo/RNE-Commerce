@@ -26,7 +26,6 @@ const MOCK_NOTIFICATIONS: NotificationItem[] = [
     message: 'Your package is on its way and scheduled to arrive by Friday, Aug 7.',
     timestamp: '2m ago',
     isRead: false,
-    targetRoute: '/(tabs)/orders/track/ord_101',
   },
   {
     id: 'notif_2',
@@ -35,7 +34,6 @@ const MOCK_NOTIFICATIONS: NotificationItem[] = [
     message: 'Use promo code FLASH20 at checkout for 20% off all minimalist footwear.',
     timestamp: '1h ago',
     isRead: false,
-    targetRoute: '/(tabs)/home',
   },
   {
     id: 'notif_3',
@@ -44,7 +42,6 @@ const MOCK_NOTIFICATIONS: NotificationItem[] = [
     message: "Thank you for your purchase! We've received your payment of $315.00.",
     timestamp: '3h ago',
     isRead: true,
-    targetRoute: '/(tabs)/orders/detail/ord_101',
   },
   {
     id: 'notif_4',

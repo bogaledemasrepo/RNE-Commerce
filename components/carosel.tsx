@@ -32,7 +32,7 @@ function Carosel({ data }: { data: Ad[] }) {
         autoPlayInterval={5000}
         scrollAnimationDuration={1000}
         onProgressChange={progress}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <View
             style={{
               flex: 1,
@@ -42,7 +42,14 @@ function Carosel({ data }: { data: Ad[] }) {
               justifyContent: 'center',
             }}
           >
-            <Image resizeMode="contain" source={{ uri: item.imageUrl }} height={200} width={400} />
+            <Image
+              style={{ borderRadius: 8 }}
+              resizeMode="stretch"
+              resizeMethod="resize"
+              source={{ uri: item.imageUrl }}
+              height={200}
+              width={400}
+            />
           </View>
         )}
       />

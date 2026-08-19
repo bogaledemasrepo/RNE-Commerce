@@ -77,7 +77,7 @@ const Home = () => {
 
           <TouchableOpacity
             style={styles.notificationBtn}
-            onPress={() => router.navigate('/(tabs)/profile/notifications/page' as any)}
+            onPress={() => router.navigate('/home/notifications/page' as any)}
             hitSlop={8}
           >
             <Ionicons name="notifications-outline" size={22} color="#1F2937" />
