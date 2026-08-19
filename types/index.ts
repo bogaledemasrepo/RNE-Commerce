@@ -43,3 +43,21 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number;
 }
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  thumbnail: string;
+  description: string;
+}
+
+export interface Ad {
+  active: boolean;
+  createdAt: string;
+  description: string;
+  id: number;
+  imageUrl: string;
+  targetUrl: string;
+  title: string;
+}

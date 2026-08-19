@@ -1,18 +1,15 @@
-import * as React from "react";
-import { Dimensions, Text, View } from "react-native";
-import { useSharedValue } from "react-native-reanimated";
-import Carousel, {
-  ICarouselInstance,
-  Pagination,
-} from "react-native-reanimated-carousel";
- 
-const data = [...new Array(6).keys()];
-const width = Dimensions.get("window").width;
- 
-function Carosel() {
+import { Ad } from '@/types';
+import * as React from 'react';
+import { Dimensions, Image, View } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
+import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated-carousel';
+
+const width = Dimensions.get('window').width;
+
+function Carosel({ data }: { data: Ad[] }) {
   const ref = React.useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
-  
+
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
       /**
@@ -23,7 +20,7 @@ function Carosel() {
       animated: true,
     });
   };
- 
+
   return (
     <View style={{ flex: 1 }}>
       <Carousel
@@ -35,30 +32,30 @@ function Carosel() {
         autoPlayInterval={5000}
         scrollAnimationDuration={1000}
         onProgressChange={progress}
-        renderItem={({ index }) => (
+        renderItem={({ item, index }) => (
           <View
             style={{
               flex: 1,
               borderWidth: 1,
-              borderColor:"#ccccccff",
-              borderRadius:8,
-              justifyContent: "center",
+              borderColor: '#ccccccff',
+              borderRadius: 8,
+              justifyContent: 'center',
             }}
           >
-            <Text style={{ textAlign: "center", fontSize: 30 }}>{index}</Text>
+            <Image resizeMode="contain" source={{ uri: item.imageUrl }} height={200} width={400} />
           </View>
         )}
       />
- 
+
       <Pagination.Basic
         progress={progress}
         data={data}
-        dotStyle={{ backgroundColor: "rgba(0,0,0,0.2)", borderRadius: 50 }}
+        dotStyle={{ backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 50 }}
         containerStyle={{ gap: 5, marginTop: 10 }}
         onPress={onPressPagination}
       />
     </View>
   );
 }
- 
+
 export default Carosel;

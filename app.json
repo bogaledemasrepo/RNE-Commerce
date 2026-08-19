@@ -20,7 +20,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.bogitech.RNECommerce",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "output": "static",

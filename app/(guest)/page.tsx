@@ -15,12 +15,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
-import { PaginatedProductResponse } from '../types';
+import { Ad, PaginatedProductResponse } from '@/types';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 40) / 2; // Precise 2-column layout width with padding
 
 const GuestCollections = () => {
+  const [ads, setAds] = useState<Ad[]>([]);
   const [activeTab, setActiveTab] = useState<'forYou' | 'bestSellers'>('forYou');
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [productData, setProductData] = useState<PaginatedProductResponse>();
@@ -30,6 +31,13 @@ const GuestCollections = () => {
   };
 
   useEffect(() => {
+    async function fetchAds() {
+      const response = await fetch(API_BASE_URL + '/ads');
+      if (response.ok) {
+        const data = await response.json();
+        setAds(data);
+      }
+    }
     async function fetchCollections() {
       const response = await fetch(
         API_BASE_URL + '/products/page?page=0&size=10&sortBy=id&sortDir=asc'
@@ -39,13 +47,14 @@ const GuestCollections = () => {
       console.log(data);
     }
     fetchCollections();
+    fetchAds();
   }, []);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Carousel Section */}
         <View style={styles.carouselContainer}>
-          <Carosel />
+          <Carosel data={ads} />
         </View>
 
         {/* Filter Tabs & Header */}

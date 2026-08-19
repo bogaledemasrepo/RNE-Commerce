@@ -19,22 +19,15 @@ import Carosel from '@/components/carosel';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
-import { PaginatedProductResponse } from '@/types';
+import { Ad, Category, PaginatedProductResponse } from '@/types';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 44) / 2; // Precise 2-column calculation
 
-export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  thumbnail: string;
-  description: string;
-}
-
 const Home = () => {
   const { user } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [activeFilter, setActiveFilter] = useState<'forYou' | 'bestSellers'>('forYou');
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -46,20 +39,30 @@ const Home = () => {
   useEffect(() => {
     async function fetchCategories() {
       const response = await fetch(API_BASE_URL + '/categories');
-      const data = await response.json();
-      setCategories(data);
-      console.log(data);
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data);
+      }
     }
-
+    async function fetchAds() {
+      const response = await fetch(API_BASE_URL + '/ads');
+      if (response.ok) {
+        const data = await response.json();
+        setAds(data);
+      }
+    }
     async function fetchCollections() {
       const response = await fetch(
         API_BASE_URL + '/products/page?page=0&size=10&sortBy=id&sortDir=asc'
       );
-      const data: PaginatedProductResponse = await response.json();
-      setProductData(data);
+      if (response.ok) {
+        const data: PaginatedProductResponse = await response.json();
+        setProductData(data);
+      }
     }
     fetchCategories();
     fetchCollections();
+    fetchAds();
   }, []);
 
   return (
@@ -132,9 +135,11 @@ const Home = () => {
         </ScrollView>
 
         {/* Hero Carousel */}
-        <View style={styles.carouselWrapper}>
-          <Carosel />
-        </View>
+        {ads.length >= 0 && (
+          <View style={styles.carouselWrapper}>
+            <Carosel data={ads} />
+          </View>
+        )}
 
         {/* Product Filter Chips & Navigation */}
         <View style={styles.filterRow}>
