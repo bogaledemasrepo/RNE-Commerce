@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import * as FileSystem from 'expo-file-system/legacy';
 interface ProfileAvatarProps {
   avatarUrl?: string | null;
   userName?: string;
@@ -18,7 +19,6 @@ export function ProfileAvatar({
   avatarUrl,
   userName = 'User',
   isVerified = true,
-  onAvatarChange,
   size = 100,
 }: ProfileAvatarProps) {
   const [loading, setLoading] = useState(false);
@@ -28,62 +28,33 @@ export function ProfileAvatar({
     setLoading(true);
     try {
       const rawToken = await AsyncStorage.getItem('token');
+      const token = rawToken ? rawToken.replace(/^Bearer\s+/i, '') : '';
 
-      if (!rawToken) {
-        Alert.alert('Authentication Error', 'Session expired. Please log in again.');
-        return;
-      }
-
-      // Ensure authorization header is strictly formatted
-      const token = rawToken.replace(/^Bearer\s+/i, '');
-
-      // Resolve URI and fallback file properties safely
-      const fileUri = asset.uri;
-      const fileName = asset.fileName || fileUri.split('/').pop() || 'avatar.jpg';
-
-      // Fallback MIME type detection based on extension if mimeType is undefined
-      const extension = fileName.split('.').pop()?.toLowerCase();
-      const mimeType = asset.mimeType || (extension === 'png' ? 'image/png' : 'image/jpeg');
-
-      // Create React Native multipart object strictly matching native expectation
-      const formData = new FormData();
-      formData.append('avatar', {
-        uri: fileUri,
-        name: fileName,
-        type: mimeType,
-      } as any);
-
-      const response = await fetch(API_BASE_URL + '/users/me', {
-        method: 'PUT',
+      const uploadResult = await FileSystem.uploadAsync(`${API_BASE_URL}/users/me`, asset.uri, {
+        httpMethod: 'PUT',
+        uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+        fieldName: 'avatar', // Must match Spring Boot @RequestParam("avatar")
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json',
         },
-        body: formData,
       });
 
-      if (response.ok) {
-        const updatedUser = await response.json();
+      if (uploadResult.status === 200) {
+        const updatedUser = JSON.parse(uploadResult.body);
         setUser(updatedUser);
-
-        if (onAvatarChange) {
-          await onAvatarChange(fileUri);
-        }
-
         Alert.alert('Success', 'Profile photo updated!');
       } else {
-        const errorText = await response.text();
-        console.error(`HTTP ${response.status} Server Error:`, errorText);
-        Alert.alert('Upload Failed', `Server responded with status code ${response.status}`);
+        console.error('Server error status:', uploadResult.status, uploadResult.body);
+        Alert.alert('Error', `Upload failed with status ${uploadResult.status}`);
       }
     } catch (error) {
-      console.error('Avatar update error:', error);
-      Alert.alert('Error', 'Failed to upload photo. Please check your network connection.');
+      console.error('Upload error:', error);
+      Alert.alert('Error', 'Failed to upload image.');
     } finally {
       setLoading(false);
     }
   };
-
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
