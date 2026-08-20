@@ -35,11 +35,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const token = await AsyncStorage.getItem('token');
 
       if (!token) {
-        console.log('NO TOKEN FOUND');
         if (isMounted) setIsLoading(false);
         return;
       }
-      console.log('TOKEN FOUND 2', token);
       try {
         const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
           method: 'GET',
@@ -48,7 +46,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(userResponse);
         if (userResponse.ok) {
           const userData = await userResponse.json();
           if (isMounted) setUser(userData);

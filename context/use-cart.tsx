@@ -1,9 +1,8 @@
 import { Product } from '@/types';
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-// 1. Extend Product to track quantity in cart
 export interface CartItem extends Product {
-  // productId: number;
   quantity: number;
 }
 
@@ -11,6 +10,7 @@ interface CartContextType {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
+  isHydrated: boolean;
   addItem: (product: Product, quantity?: number) => void;
   removeItem: (id: number) => void;
   incrementQuantity: (id: number) => void;
@@ -18,12 +18,47 @@ interface CartContextType {
   clearCart: () => void;
 }
 
+const CART_STORAGE_KEY = '@cart_items_v1';
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Add Item or increase quantity if it already exists
+  // 1. Rehydrate cart state from AsyncStorage on app launch
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem(CART_STORAGE_KEY);
+        if (storedCart) {
+          setItems(JSON.parse(storedCart));
+        }
+      } catch (error) {
+        console.error('Failed to load cart from storage:', error);
+      } finally {
+        setIsHydrated(true);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  // 2. Persist cart state to AsyncStorage whenever `items` changes
+  useEffect(() => {
+    if (!isHydrated) return; // Prevent overwriting stored data with default empty state during load
+
+    const saveCart = async () => {
+      try {
+        await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      } catch (error) {
+        console.error('Failed to save cart to storage:', error);
+      }
+    };
+
+    saveCart();
+  }, [items, isHydrated]);
+
+  // Add Item or increase quantity
   const addItem = useCallback((product: Product, quantity: number = 1) => {
     setItems((prevItems) => {
       const existingIndex = prevItems.findIndex((item) => item.id === product.id);
@@ -41,19 +76,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   }, []);
 
-  // Remove item completely from cart
+  // Remove item completely
   const removeItem = useCallback((id: number) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   }, []);
 
-  // Increment item quantity by 1
+  // Increment item quantity
   const incrementQuantity = useCallback((id: number) => {
     setItems((prevItems) =>
       prevItems.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
     );
   }, []);
 
-  // Decrement item quantity by 1 (removes item if quantity drops to 0)
+  // Decrement item quantity (removes if 0)
   const decrementQuantity = useCallback((id: number) => {
     setItems((prevItems) =>
       prevItems
@@ -67,7 +102,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems([]);
   }, []);
 
-  // Compute total count of items (for cart badge)
+  // Compute total item count
   const totalItems = useMemo(() => {
     return items.reduce((acc, item) => acc + item.quantity, 0);
   }, [items]);
@@ -82,6 +117,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       items,
       totalItems,
       totalPrice,
+      isHydrated,
       addItem,
       removeItem,
       incrementQuantity,
@@ -92,6 +128,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       items,
       totalItems,
       totalPrice,
+      isHydrated,
       addItem,
       removeItem,
       incrementQuantity,
@@ -103,7 +140,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
-// 2. Custom hook with provider check
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (!context) {
