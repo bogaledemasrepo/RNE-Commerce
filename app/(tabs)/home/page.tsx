@@ -48,6 +48,7 @@ const Home = () => {
       const response = await fetch(API_BASE_URL + '/ads');
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         setAds(data);
       }
     }
@@ -137,7 +138,7 @@ const Home = () => {
         </ScrollView>
 
         {/* Hero Carousel */}
-        {ads.length >= 0 && (
+        {ads && ads.length > 0 && (
           <View style={styles.carouselWrapper}>
             <Carosel data={ads} />
           </View>
@@ -361,6 +362,7 @@ const styles = StyleSheet.create({
   carouselWrapper: {
     paddingHorizontal: 12,
     marginBottom: 20,
+    minHeight: 180, // Ensures scrollview parent reserves space
   },
   filterRow: {
     flexDirection: 'row',
