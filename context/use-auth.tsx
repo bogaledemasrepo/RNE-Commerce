@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   async function logout(): Promise<void> {
     try {
-      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('token');
       setUser(null);
     } catch {
       Alert.alert('Error', 'Failed to log out');
@@ -32,13 +32,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let isMounted = true;
 
     async function initializeAuth() {
-      const token = AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem('token');
 
       if (!token) {
+        console.log('NO TOKEN FOUND');
         if (isMounted) setIsLoading(false);
         return;
       }
-
+      console.log('TOKEN FOUND 2', token);
       try {
         const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
           method: 'GET',
@@ -47,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             Authorization: `Bearer ${token}`,
           },
         });
-
+        console.log(userResponse);
         if (userResponse.ok) {
           const userData = await userResponse.json();
           if (isMounted) setUser(userData);

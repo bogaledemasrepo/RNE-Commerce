@@ -50,31 +50,6 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: password, device_name: 'Windows 10' }),
-      });
-      const { token } = await res.json();
-      if (res.ok) {
-        const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        });
-
-        const user = await userResponse.json();
-        localStorage.setItem('token', token);
-        setUser(user);
-      } else {
-        throw new Error('Login failed');
-      }
-    } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
-    }
-  };
-
   const handleSubmit = async () => {
     if (!validate()) return;
 
@@ -105,7 +80,7 @@ export default function Login() {
       });
       if (userResponse.ok) {
         const user = await userResponse.json();
-
+        await AsyncStorage.setItem('token', token);
         setUser(user);
         Toast.success('Login successful!');
         router.replace('/(tabs)/home/page');

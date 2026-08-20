@@ -14,7 +14,7 @@ import COLORS from '@/constants/color';
 import { useAuth } from '@/context/use-auth';
 
 const Profile = () => {
-  const { user, setUser, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out of your account?', [
