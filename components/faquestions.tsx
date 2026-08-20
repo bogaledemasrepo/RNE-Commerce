@@ -7,12 +7,8 @@ export function FAQuestions({ children }: { children: ReactNode }) {
     <DynamicModal title="Change Password" trigger={<>{children}</>}>
       {/* Main Modal Body */}
       <View>
-        <Text style={styles.modalBodyText}>
-          Enter your promo code or choose from active discounts below.
-        </Text>
-
         <TouchableOpacity style={styles.applyBtn}>
-          <Text style={styles.applyBtnText}>Apply FIRST50 ($50 Off)</Text>
+          <Text style={styles.applyBtnText}>None implemented component!</Text>
         </TouchableOpacity>
       </View>
     </DynamicModal>
