@@ -1,99 +1,72 @@
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import OrderItemCard from '@/components/order-item-card';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
-import { Order, OrderStatus, TabType } from '@/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Order, TabType } from '@/types';
+
+const TABS: TabType[] = ['active', 'completed', 'cancelled', 'all'];
 
 export default function OrderScreen() {
-  const [activeTab, setActiveTab] = useState<TabType>('active');
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const filteredOrders = orders.filter((order) => {
-    if (activeTab == 'all') return true;
-
-    if (activeTab === 'active') {
-      return order.status === 'processing' || order.status === 'shipped';
-    }
-    if (activeTab === 'completed') {
-      return order.status === 'delivered';
-    }
-    if (activeTab === 'cancelled') {
-      return order.status === 'cancelled';
-    }
-    return true;
-  });
-
-  const getStatusBadge = (status: OrderStatus) => {
-    switch (status) {
-      case 'processing':
-        return {
-          label: 'Processing',
-          bgColor: '#FEF3C7',
-          textColor: '#D97706',
-          icon: 'time-outline' as const,
-        };
-      case 'shipped':
-        return {
-          label: 'In Transit',
-          bgColor: '#E0F2FE',
-          textColor: '#0284C7',
-          icon: 'airplane-outline' as const,
-        };
-      case 'delivered':
-        return {
-          label: 'Delivered',
-          bgColor: '#D1FAE5',
-          textColor: '#059669',
-          icon: 'checkmark-circle-outline' as const,
-        };
-      case 'cancelled':
-        return {
-          label: 'Cancelled',
-          bgColor: '#FEE2E2',
-          textColor: '#DC2626',
-          icon: 'close-circle-outline' as const,
-        };
-      default:
-        return {
-          label: 'Processing',
-          bgColor: '#FEF3C7',
-          textColor: '#D97706',
-          icon: 'time-outline' as const,
-        };
-    }
-  };
+  // 2. Memoized Filtering Execution
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      if (activeTab === 'all') return true;
+      if (activeTab === 'active') {
+        return order.status === 'PENDING' || order.status === 'SHIPPED';
+      }
+      if (activeTab === 'completed') {
+        return order.status === 'DELIVERED';
+      }
+      if (activeTab === 'cancelled') {
+        return order.status === 'CANCELLED';
+      }
+      return true;
+    });
+  }, [orders, activeTab]);
 
   useEffect(() => {
     async function fetchOrders() {
-      const token = (await AsyncStorage.getItem('token')) || '';
-      const response = await fetch(API_BASE_URL + '/orders', {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data);
+      try {
+        const token = (await AsyncStorage.getItem('token')) || '';
+        const response = await fetch(`${API_BASE_URL}/orders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
       }
     }
 
     fetchOrders();
   }, []);
 
+  const renderOrderItem = useCallback(
+    ({ item }: { item: Order }) => <OrderItemCard item={item} />,
+    []
+  );
+
   return (
     <View style={styles.safeArea}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Orders</Text>
       </View>
 
       {/* Tabs Filter */}
       <View style={styles.tabContainer}>
-        {(['all', 'active', 'completed', 'cancelled'] as TabType[]).map((tab) => {
+        {TABS.map((tab) => {
           const isSelected = activeTab === tab;
           return (
             <Pressable
@@ -133,94 +106,10 @@ export default function OrderScreen() {
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => {
-            const badge = getStatusBadge(item.status);
-            const primaryItem = item.items[0];
-            const hasMoreItems = item.items.length > 1;
-
-            return (
-              <View style={styles.orderCard}>
-                {/* Order Top Bar */}
-                <View style={styles.cardHeader}>
-                  <View style={styles.orderMeta}>
-                    <Text style={styles.orderNumber}>{item.orderNumber}</Text>
-                    <Text style={styles.orderDate}>{item.date}</Text>
-                  </View>
-
-                  <View style={[styles.statusBadge, { backgroundColor: badge.bgColor }]}>
-                    <Ionicons name={badge.icon} size={14} color={badge.textColor} />
-                    <Text style={[styles.statusText, { color: badge.textColor }]}>
-                      {badge.label}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Item Details Block */}
-                <View style={styles.cardBody}>
-                  <Image source={{ uri: primaryItem.image }} style={styles.productThumbnail} />
-
-                  <View style={styles.productInfo}>
-                    <Text style={styles.productName} numberOfLines={1}>
-                      {primaryItem.name}
-                    </Text>
-                    <Text style={styles.productQty}>
-                      Qty: {primaryItem.quantity} • ${primaryItem.price.toFixed(2)}
-                    </Text>
-
-                    {hasMoreItems && (
-                      <Text style={styles.moreItemsText}>
-                        + {item.items.length - 1} more item(s)
-                      </Text>
-                    )}
-                  </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                {/* Card Footer / Action Bar */}
-                <View style={styles.cardFooter}>
-                  <View style={styles.totalContainer}>
-                    <Text style={styles.totalLabel}>Total Amount</Text>
-                    <Text style={styles.totalPrice}>${item.totalAmount.toFixed(2)}</Text>
-                  </View>
-
-                  <View style={styles.actionGroup}>
-                    {item.status === 'shipped' && (
-                      <TouchableOpacity
-                        style={styles.primaryActionBtn}
-                        onPress={() => router.navigate(`/(tabs)/orders/track/${item.id}` as any)}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={styles.primaryActionText}>Track Order</Text>
-                        <Feather name="truck" size={14} color="#FFFFFF" />
-                      </TouchableOpacity>
-                    )}
-
-                    {item.status === 'delivered' && (
-                      <TouchableOpacity
-                        style={styles.secondaryActionBtn}
-                        onPress={() => router.navigate(`/(tabs)/orders/detail/${item.id}` as any)}
-                        activeOpacity={0.8}
-                      >
-                        <Text style={styles.secondaryActionText}>Reorder</Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {/* <TouchableOpacity
-                      style={styles.detailsBtn}
-                      onPress={() => router.navigate(`/(tabs)/orders/detail/${item.id}` as any)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.detailsBtnText}>Details</Text>
-                      <Feather name="chevron-right" size={16} color="#4B5563" />
-                    </TouchableOpacity> */}
-                  </View>
-                </View>
-              </View>
-            );
-          }}
+          renderItem={renderOrderItem}
+          initialNumToRender={6}
+          maxToRenderPerBatch={10}
+          windowSize={5}
         />
       )}
     </View>
@@ -274,145 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 24,
   },
-  orderCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  orderMeta: {
-    gap: 2,
-  },
-  orderNumber: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  orderDate: {
-    fontSize: 12,
-    color: '#9CA3AF',
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F3F4F6',
-    marginVertical: 12,
-  },
-  cardBody: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  productThumbnail: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: '#F3F4F6',
-  },
-  productInfo: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'center',
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
-  },
-  productQty: {
-    fontSize: 13,
-    color: '#6B7280',
-  },
-  moreItemsText: {
-    fontSize: 12,
-    color: COLORS.primary || '#4830D3',
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  totalContainer: {
-    gap: 2,
-  },
-  totalLabel: {
-    fontSize: 11,
-    color: '#9CA3AF',
-    fontWeight: '500',
-  },
-  totalPrice: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  actionGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  primaryActionBtn: {
-    backgroundColor: COLORS.primary || '#4830D3',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    height: 36,
-    borderRadius: 10,
-  },
-  primaryActionText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  secondaryActionBtn: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 14,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  secondaryActionText: {
-    color: '#374151',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  detailsBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    paddingLeft: 4,
-  },
-  detailsBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#4B5563',
-  },
+
   emptyContainer: {
     flex: 1,
     alignItems: 'center',

@@ -16,7 +16,6 @@ import ToastManager, { Toast } from 'toastify-react-native';
 import { EcommerceLoader } from '@/components/EcommerceLoader';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
-import { useAuth } from '@/context/use-auth';
 import { useCart } from '@/context/use-cart';
 import { Product } from '@/types';
 import { Feather, Ionicons } from '@expo/vector-icons';
@@ -29,7 +28,6 @@ export default function DetailScreen() {
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
   const { addItem } = useCart();
-  const { user } = useAuth();
   const [item, setItem] = useState<Product>();
 
   const handleAddToCart = () => {

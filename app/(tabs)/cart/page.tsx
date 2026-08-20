@@ -17,24 +17,15 @@ import COLORS from '@/constants/color';
 import { useCart } from '@/context/use-cart';
 
 export default function CartPage() {
-  const {
-    items,
-    addItem,
-    clearCart,
-    totalItems,
-    totalPrice,
-    decrementQuantity,
-    incrementQuantity,
-    removeItem,
-  } = useCart();
+  const { items, decrementQuantity, incrementQuantity, removeItem } = useCart();
   // const [cartItems, setCartItems] = useState<CartItem[]>(MOCK_CART);
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
 
   // Quantity Handler
   const updateQuantity = (id: number, action: 'increase' | 'decrease') => {
-    if (action == 'decrease') decrementQuantity(id);
-    if (action == 'increase') incrementQuantity(id);
+    if (action === 'decrease') decrementQuantity(id);
+    if (action === 'increase') incrementQuantity(id);
   };
 
   // Item Removal Confirmation

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { DynamicModal } from './DynamicModal';
+import { DynamicModal } from './dynamic-modal';
 import MenuItem from './menu-item';
 
 export function ChangePassword() {

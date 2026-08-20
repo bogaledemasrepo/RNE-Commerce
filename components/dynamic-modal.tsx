@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ReactNode, useCallback, useState } from 'react';
 import {
-  Dimensions,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -11,8 +10,6 @@ import {
   View,
 } from 'react-native';
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface DynamicModalProps {
   /** The clickable element that opens the modal */

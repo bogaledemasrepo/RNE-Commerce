@@ -24,7 +24,7 @@ export interface PaginatedProductResponse {
   last: boolean;
 }
 
-export type OrderStatus = 'all' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'ALL' | 'PENDING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 export type TabType = 'all' | 'active' | 'completed' | 'cancelled';
 
 export interface OrderItem {

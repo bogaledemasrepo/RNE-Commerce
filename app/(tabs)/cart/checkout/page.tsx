@@ -124,8 +124,8 @@ export default function CheckoutPage() {
     }
   };
   useEffect(() => {
-    if (items.length == 0) router.replace('/(tabs)/orders/page');
-  }, []);
+    if (items.length === 0) router.replace('/(tabs)/orders/page');
+  }, [items.length]);
   return (
     <View style={styles.safeArea}>
       {/* Header Bar */}

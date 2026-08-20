@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { DynamicModal } from './DynamicModal';
+import { DynamicModal } from './dynamic-modal';
 
 export function Aboutus({ children }: { children: ReactNode }) {
   return (
