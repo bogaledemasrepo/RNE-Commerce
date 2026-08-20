@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import OrderItemCard from '@/components/order-item-card';
+import { OrderItemCard } from '@/components/order-item-card';
 import { API_BASE_URL } from '@/constants';
 import COLORS from '@/constants/color';
 import { Order, TabType } from '@/types';
