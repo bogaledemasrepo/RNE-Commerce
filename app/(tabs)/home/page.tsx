@@ -48,7 +48,6 @@ const Home = () => {
       const response = await fetch(API_BASE_URL + '/ads');
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setAds(data);
       }
     }

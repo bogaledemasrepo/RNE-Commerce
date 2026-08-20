@@ -24,7 +24,7 @@ export default function Carosel({ data }: CarouselProps) {
 
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
-      count: index - Math.round(progress.value),
+      index, // Directly pass target index
       animated: true,
     });
   };
