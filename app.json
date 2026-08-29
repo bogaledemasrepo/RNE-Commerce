@@ -39,29 +39,17 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "resizeMode": "cover",
+          "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
             "backgroundColor": "#000000"
-          },
-          "enableFullScreenImage_legacy": true
+          }
         }
       ],
       "expo-secure-store",
       "expo-font",
       "expo-image",
-      "expo-status-bar",
       "expo-web-browser"
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "6a2d4176-45a5-481d-9df3-23abdc3ec2ab"
-      }
-    }
+    ]
   }
 }
